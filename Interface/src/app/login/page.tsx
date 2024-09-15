@@ -26,7 +26,7 @@ export default function Login() {
       const result = await signInWithEmailAndPassword(email, password);
 
       if (result?.user?.emailVerified) {
-        router.push("/home/catalog");
+        router.push("/dashboard/projects");
       } else {
         setLoginError("Email not verified. Please check your inbox.");
         await auth.signOut(); // Force sign out if not verified
