@@ -8,6 +8,7 @@ import { auth } from "@/app/firebase/config";
 import { UserAuth } from "../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { addUser, findUserByEmail } from "@/db/user";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
@@ -19,6 +20,7 @@ export default function Signup() {
   const router = useRouter();
   const { googleSignIn } = UserAuth();
   const [popupVisible, setPopupVisible] = useState(false);
+  const [alertmsg, setAlertmsg] = useState("");
   const [passwordError, setPasswordError] = useState(""); // Password error state
 
   // Password validation logic
@@ -47,16 +49,37 @@ export default function Signup() {
     }
 
     try {
-      // Create user with email and password
+      // Check if user already exists in MongoDB
+      const existingUser = await findUserByEmail(email);
+      if (existingUser) {
+        console.log("User already exists in MongoDB");
+        setAlertmsg("User Already exists");
+        setPopupVisible(true);
+        setTimeout(() => {
+          setPopupVisible(false);
+          router.push("/login");
+        }, 5000);
+        return;
+      }
+
+      // Create user with email and password in Firebase
       const userCredential = await createUserWithEmailAndPassword(
         email,
         password
       );
+
       if (userCredential) {
+        // Firebase user ID
+        const userId = userCredential.user.uid;
+
+        // Create a new user in MongoDB
+        await addUser(userId, email, userId, []);
+
         // Send email verification
         const success = await sendEmailVerification();
         if (success) {
           console.log("Verification email sent");
+          setAlertmsg("Email verification sent! Redirecting to login...");
           setPopupVisible(true);
 
           // Show popup and redirect to login after delay
@@ -77,6 +100,30 @@ export default function Signup() {
   const handleSignIn = async () => {
     try {
       await googleSignIn();
+      const user = auth.currentUser;
+      if (user) {
+        const existingUser = await findUserByEmail(user.email);
+        if (existingUser) {
+          console.log("User already exists in MongoDB");
+          setAlertmsg("User Already exists");
+          setPopupVisible(true);
+          setTimeout(() => {
+            setPopupVisible(false);
+            router.push("/login");
+          }, 5000);
+          return;
+        }
+
+        const userId = user.uid; // Firebase UID
+        const email = user.email || ""; // Email (if available)
+        const name = user.displayName || ""; // Display name (if available)
+
+        // Call your MongoDB function to add the user
+        await addUser(userId, name, email, []);
+        console.log(
+          "User successfully signed in with Google and added to MongoDB"
+        );
+      }
     } catch (error) {
       console.log(error);
     }
@@ -134,7 +181,7 @@ export default function Signup() {
 
         {popupVisible && (
           <div className="mt-4 p-3 bg-green-600 text-white text-center rounded-lg">
-            Email verification sent! Redirecting to login...
+            {alertmsg}
           </div>
         )}
 
