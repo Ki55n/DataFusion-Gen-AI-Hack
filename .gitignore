@@ -37,3 +37,20 @@
 # typescript
 **/*.tsbuildinfo
 **/next-env.d.ts
+
+*.ipynb_checkpoints
+*.env
+*.pyc
+*.idea
+.vscode/*
+_archiv/*
+.DS_store
+*.ipa
+*.log
+*.zip
+*.ckpt
+*.pdf
+
+# ignore files and folders
+notebooks/
+uploads/

@@ -1,0 +1,11 @@
+fastapi[standard]
+python-dotenv
+langchain
+langgraph
+langchain-experimental
+google-generativeai 
+langchain-google-genai
+tabulate
+pandas
+jsonschema
+pysqlite3
