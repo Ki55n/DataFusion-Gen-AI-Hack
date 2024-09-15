@@ -3,7 +3,6 @@ import Aside from "@/components/Aside";
 import React from "react";
 import Header from "@/components/Header";
 import Providers from "@/app/providers";
-import Chatbot from "@/components/chatbot";
 
 export const metadata: Metadata = {
   title: "Data fusion",
@@ -40,7 +39,7 @@ export default function RootLayout({
 
             {/* Chatbot fixed button */}
             <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
-              <Chatbot />
+              Chatbot
             </div>
           </main>
         </Providers>
