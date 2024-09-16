@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 # from backend_dateja.my_agent.main import graph
 from backend_dateja.my_agent.WorkflowManager import WorkflowManager
-
+from backend_dateja.receptionist.assistant import VirtualAssistant
 from pydantic import BaseModel
 
 
@@ -17,19 +17,20 @@ class QueryRequest(BaseModel):
 
 app = FastAPI()
 
-app.include_router(sqlite_router)
-
 # load credentials
 load_dotenv()
 API_KEY = os.getenv("GOOGLE_API_KEY")
 ENDPOINT_URL = os.getenv("DB_ENDPOINT_URL")
 
-# for deployment on langgraph cloud
-graph = WorkflowManager(api_key=API_KEY, endpoint_url=ENDPOINT_URL).returnGraph()
+# define csv_agent_graph
+csv_agent_graph = WorkflowManager(api_key=API_KEY, endpoint_url=ENDPOINT_URL).returnGraph()
 
+# define receptionist_agent
+assistant = VirtualAssistant(api_key=API_KEY)
+receptionist_agent = assistant.get_agent()
 
-@app.post("/call-model")
-async def call_model(request: QueryRequest):
+@app.post("/csv-agent/call-model")
+async def call_csv_agent(request: QueryRequest):
     uuid = request.uuid
     query = request.query
 
@@ -38,7 +39,20 @@ async def call_model(request: QueryRequest):
         raise HTTPException(status_code=400, detail="Missing uuid or query")
 
     try:
-        response = graph.invoke({"question": query, "uuid": uuid})
+        response = csv_agent_graph.invoke({"question": query, "uuid": uuid})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
+
+    return response
+
+@app.post("/receptionist-agent/call-model")
+async def call_receptionist_agent(query: str):
+    # Check if both uuid and query are provided
+    if not query:
+        raise HTTPException(status_code=400, detail="Missing query")
+
+    try:
+        response = receptionist_agent.invoke(query)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal server error: {str(e)}")
 
@@ -48,4 +62,4 @@ async def call_model(request: QueryRequest):
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)

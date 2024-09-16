@@ -8,7 +8,8 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 # Create FastAPI router
-sqlite_router = APIRouter(prefix="/sqlitedb")
+# sqlite_router = APIRouter(prefix="/sqlitedb")
+sqlite_router = FastAPI(prefix="/sqlitedb")
 
 UPLOAD_DIR = "uploads"
 os.makedirs(
@@ -29,7 +30,7 @@ def convert_csv_to_sqlite(csv_file_path: str, sqlite_file_path: str):
         raise RuntimeError(f"Error converting CSV to SQLite: {str(e)}")
 
 
-@router.post("/upload-file")
+@sqlite_router.post("/upload-file")
 async def upload_file(file: UploadFile = File(...)):
     try:
         # Check if the file is uploaded
@@ -89,7 +90,7 @@ class QueryRequest(BaseModel):
 
 
 # Endpoint for executing SQL queries on uploaded databases
-@router.post("/execute-query")
+@sqlite_router.post("/execute-query")
 async def execute_query(request: QueryRequest):
     uuid = request.uuid
     query = request.query
@@ -124,7 +125,7 @@ async def execute_query(request: QueryRequest):
 
 
 # Endpoint for retrieving the schema of the database
-@router.get("/get-schema/{uuid}")
+@sqlite_router.get("/get-schema/{uuid}")
 async def get_schema(uuid: str):
     # Check if uuid is provided
     if not uuid:
@@ -173,6 +174,6 @@ async def get_schema(uuid: str):
 
 
 # Basic hello world endpoint
-@router.get("/")
+@sqlite_router.get("/")
 async def root():
     return {"message": "Hello World"}

@@ -54,3 +54,4 @@ _archiv/*
 # ignore files and folders
 notebooks/
 uploads/
+data/
