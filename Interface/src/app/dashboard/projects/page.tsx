@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import {
-  UploadCloud,
+  PlusCircle,
   Trash2,
   Edit,
   MoreVertical,
@@ -24,7 +25,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
+import { createProject } from "@/db/project";
 
 type Project = {
   id: number;
@@ -59,20 +72,31 @@ export default function Component() {
     },
   ]);
 
-  const [file, setFile] = useState<File | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [newProject, setNewProject] = useState({ name: "", description: "" });
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      setFile(event.target.files[0]);
-      // Simulating file upload and new project creation
-      const newProject: Project = {
-        id: projects.length + 1,
-        name: event.target.files[0].name,
-        description: "Newly uploaded file for cleaning",
-        lastUpdated: new Date().toISOString().split("T")[0],
-        active: true,
-      };
-      setProjects([...projects, newProject]);
+  const handleCreateProject = async (e: React.FormEvent) => {
+    e.preventDefault();
+    // const newprj =
+    try {
+      // const project = await createProject()
+      // if (project) {
+      //   setProjects([
+      //     ...projects,
+      //     {
+      //       ...project,
+      //       id: projects.length + 1,
+      //       lastUpdated: new Date().toISOString().split("T")[0],
+      //       active: true,
+      //     },
+      //   ]);
+      //   setIsOpen(false);
+      //   setNewProject({ name: "", description: "" });
+      // } else {
+      //   console.error("Failed to create project");
+      // }
+    } catch (error) {
+      console.error("Error creating project:", error);
     }
   };
 
@@ -81,7 +105,6 @@ export default function Component() {
   };
 
   const handleEditProject = (id: number) => {
-    // Placeholder for edit functionality
     console.log(`Editing project with id: ${id}`);
   };
 
@@ -98,21 +121,58 @@ export default function Component() {
       <header className="mb-8">
         <h1 className="text-4xl font-bold text-gray-100 mb-4">All Projects</h1>
         <div className="flex items-center space-x-4">
-          <Input
-            type="file"
-            onChange={handleFileUpload}
-            className="hidden"
-            id="file-upload"
-          />
-          <label htmlFor="file-upload" className="cursor-pointer">
-            <Button variant="outline">
-              <UploadCloud className="mr-2 h-4 w-4" />
-              Upload New File
-            </Button>
-          </label>
-          {file && (
-            <p className="text-sm text-gray-400">File selected: {file.name}</p>
-          )}
+          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create New Project
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] bg-gray-800 text-gray-100">
+              <DialogHeader>
+                <DialogTitle>Create New Project</DialogTitle>
+                <DialogDescription>
+                  Enter the details for your new project here.
+                </DialogDescription>
+              </DialogHeader>
+              <form onSubmit={handleCreateProject}>
+                <div className="grid gap-4 py-4">
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-right">
+                      Name
+                    </Label>
+                    <Input
+                      id="name"
+                      value={newProject.name}
+                      onChange={(e) =>
+                        setNewProject({ ...newProject, name: e.target.value })
+                      }
+                      className="col-span-3 bg-gray-700 text-gray-100"
+                    />
+                  </div>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="description" className="text-right">
+                      Description
+                    </Label>
+                    <Textarea
+                      id="description"
+                      value={newProject.description}
+                      onChange={(e: any) =>
+                        setNewProject({
+                          ...newProject,
+                          description: e.target.value,
+                        })
+                      }
+                      className="col-span-3 bg-gray-700 text-gray-100"
+                    />
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button type="submit">Create Project</Button>
+                </DialogFooter>
+              </form>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Aside from "@/components/Aside";
 import React from "react";
-import Header from "@/components/Header";
 import Providers from "@/app/providers";
 
 export const metadata: Metadata = {
@@ -29,7 +28,7 @@ export default function RootLayout({
             <Aside />
 
             {/* Main Content */}
-            <div className="flex-grow p-6 overflow-y-auto h-screen">
+            <div className="flex-grow overflow-y-auto h-screen">
               {/* Header remains at the top of the main content */}
               {/* <Header user={user} /> */}
 

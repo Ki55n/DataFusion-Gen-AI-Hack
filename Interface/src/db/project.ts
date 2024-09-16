@@ -29,7 +29,7 @@ interface Project {
   userId: string; // Assuming userId is a string, modify as needed
 }
 
-async function createProject(project: Project) {
+export async function createProject(project: Project) {
   try {
     await client.connect();
     const database = client.db("test");
@@ -40,6 +40,7 @@ async function createProject(project: Project) {
     console.log(
       `New project created with the following id: ${result.insertedId}`
     );
+    return project;
   } catch (err) {
     console.error("Error creating project:", err);
   } finally {

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import Aside from "@/components/Aside";
 import React from "react";
-import Header from "@/components/Header";
 import Providers from "@/app/providers";
 
 export const metadata: Metadata = {
