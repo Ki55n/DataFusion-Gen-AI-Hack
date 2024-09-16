@@ -8,8 +8,7 @@ from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
 # Create FastAPI router
-router = APIRouter()
-# router = FastAPI()
+sqlite_router = APIRouter(prefix="/sqlitedb")
 
 UPLOAD_DIR = "uploads"
 os.makedirs(
