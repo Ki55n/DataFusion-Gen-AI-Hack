@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,81 +37,85 @@ import {
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
-import { createProject } from "@/db/project";
+import { createProject, getProjectsByUserId } from "@/db/project";
+import { UserAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/router";
+import { redirect } from "next/navigation";
+import { File } from "@/db/project";
 
-type Project = {
-  id: number;
+interface Project {
   name: string;
   description: string;
-  lastUpdated: string;
-  active: boolean;
-};
+  createdAt: Date;
+  status: string;
+  files: File[];
+  _id?: string; // MongoDB will generate this
+  userId: string; // Assuming userId is a string, modify as needed
+}
 
 export default function Component() {
-  const [projects, setProjects] = useState<Project[]>([
-    {
-      id: 1,
-      name: "Customer Data",
-      description: "Clean and normalize customer information",
-      lastUpdated: "2023-05-15",
-      active: true,
-    },
-    {
-      id: 2,
-      name: "Sales Records",
-      description: "Remove duplicates and standardize formats",
-      lastUpdated: "2023-05-10",
-      active: false,
-    },
-    {
-      id: 3,
-      name: "Product Catalog",
-      description: "Update product descriptions and categories",
-      lastUpdated: "2023-05-05",
-      active: true,
-    },
-  ]);
+  const { user }: any = UserAuth();
+  const [projects, setProjects] = useState<Project[]>([]);
 
   const [isOpen, setIsOpen] = useState(false);
   const [newProject, setNewProject] = useState({ name: "", description: "" });
 
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (user && user.uid) {
+        try {
+          const fetchedProjects = await getProjectsByUserId(user.uid);
+          setProjects(fetchedProjects);
+        } catch (error) {
+          console.error("Error fetching projects:", error);
+        }
+      }
+    };
+
+    fetchProjects();
+  }, [user]); // Run this effect when the user changes
+
   const handleCreateProject = async (e: React.FormEvent) => {
     e.preventDefault();
-    // const newprj =
     try {
-      // const project = await createProject()
-      // if (project) {
-      //   setProjects([
-      //     ...projects,
-      //     {
-      //       ...project,
-      //       id: projects.length + 1,
-      //       lastUpdated: new Date().toISOString().split("T")[0],
-      //       active: true,
-      //     },
-      //   ]);
-      //   setIsOpen(false);
-      //   setNewProject({ name: "", description: "" });
-      // } else {
-      //   console.error("Failed to create project");
-      // }
+      const addedProject = {
+        name: newProject.name,
+        description: newProject.description,
+        createdAt: new Date(),
+        status: "active",
+        files: [],
+        userId: user.uid, // Assuming a default user ID, modify as needed
+      };
+
+      const createdProject = await createProject(user.uid, addedProject);
+
+      if (createdProject) {
+        setProjects([...projects, addedProject]);
+        setIsOpen(false);
+        setNewProject({ name: "", description: "" });
+      }
     } catch (error) {
       console.error("Error creating project:", error);
     }
   };
 
-  const handleDeleteProject = (id: number) => {
-    setProjects(projects.filter((project) => project.id !== id));
+  const handleDeleteProject = (id: string) => {
+    setProjects(projects.filter((project) => project._id !== id));
   };
 
-  const handleEditProject = (id: number) => {
+  const handleEditProject = (id: string) => {
     console.log(`Editing project with id: ${id}`);
   };
 
-  const handleToggleActive = (id: number) => {
+  const handleToggleActive = (id: string) => {
     setProjects(
       projects.map((project) =>
-        project.id === id ? { ...project, active: !project.active } : project
+        project._id === id
+          ? {
+              ...project,
+              status: project.status === "active" ? "inactive" : "active",
+            }
+          : project
       )
     );
   };
@@ -157,7 +161,7 @@ export default function Component() {
                     <Textarea
                       id="description"
                       value={newProject.description}
-                      onChange={(e: any) =>
+                      onChange={(e) =>
                         setNewProject({
                           ...newProject,
                           description: e.target.value,
@@ -179,9 +183,11 @@ export default function Component() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {projects.map((project) => (
           <Card
-            key={project.id}
+            key={project._id?.toString()}
             className={`w-full bg-gray-800 border-gray-700 ${
-              project.active ? "border-green-500" : "border-gray-600"
+              project.status === "active"
+                ? "border-green-500"
+                : "border-gray-600"
             }`}
           >
             <CardHeader>
@@ -202,14 +208,14 @@ export default function Component() {
                     className="bg-gray-800 text-gray-100"
                   >
                     <DropdownMenuItem
-                      onClick={() => handleEditProject(project.id)}
+                      onClick={() => handleEditProject(project._id!)}
                       className="hover:bg-gray-700"
                     >
                       <Edit className="mr-2 h-4 w-4" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onClick={() => handleDeleteProject(project.id)}
+                      onClick={() => handleDeleteProject(project._id!)}
                       className="hover:bg-gray-700"
                     >
                       <Trash2 className="mr-2 h-4 w-4" />
@@ -224,28 +230,33 @@ export default function Component() {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-gray-400 mb-4">
-                Last updated: {project.lastUpdated}
+                Last updated: {project.createdAt.toLocaleDateString()}
               </p>
               <div className="flex items-center space-x-2">
                 <Switch
-                  id={`project-active-${project.id}`}
-                  checked={project.active}
-                  onCheckedChange={() => handleToggleActive(project.id)}
+                  id={`project-active-${project._id}`}
+                  checked={project.status === "active"}
+                  onCheckedChange={() => handleToggleActive(project._id!)}
                 />
                 <label
-                  htmlFor={`project-active-${project.id}`}
+                  htmlFor={`project-active-${project._id}`}
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-gray-300"
                 >
-                  {project.active ? "Active" : "Inactive"}
+                  {project.status === "active" ? "Active" : "Inactive"}
                 </label>
               </div>
             </CardContent>
             <CardFooter className="flex justify-between">
-              <Link href={`/project/${project.id}`}>
+              <Link
+                href={{
+                  pathname: `/project/${project._id}`,
+                  query: project.name,
+                }}
+              >
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleEditProject(project.id)}
+                  onClick={() => handleEditProject(project._id!)}
                   className="text-gray-300 hover:text-gray-100 border-gray-600 hover:bg-gray-700"
                 >
                   <ArrowUpRightFromCircle className="mr-2 h-4 w-4" />
@@ -255,7 +266,7 @@ export default function Component() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => handleDeleteProject(project.id)}
+                onClick={() => handleDeleteProject(project._id!)}
                 className="text-gray-300 hover:text-gray-100 border-gray-600 hover:bg-gray-700"
               >
                 <Trash2 className="mr-2 h-4 w-4" />

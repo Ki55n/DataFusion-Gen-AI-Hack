@@ -1,38 +1,18 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileIcon, Trash2Icon, UploadIcon } from "lucide-react";
+import { FileIcon, Sparkles, UploadIcon } from "lucide-react";
+
 interface FileItem {
   id: string;
   name: string;
   size: string;
   uploadDate: string;
 }
-import { useSearchParams } from "next/navigation";
-
-import { UserAuth } from "@/app/context/AuthContext";
 
 export default function Component({ params }: { params: { id: string } }) {
-  const searchparams = useSearchParams();
-  const { user }: any = UserAuth();
-
-  const [projectName, setProjectName] = useState<string>("");
-
-  // useEffect(() => {
-  //   const fetchProjectDetails = async () => {
-  //     try {
-  //       const projectDetails = await getProjectDetails(params.id);
-  //       setProjectName(projectDetails.name);
-  //     } catch (error) {
-  //       console.error("Error fetching project details:", error);
-  //     }
-  //   };
-
-  //   fetchProjectDetails();
-  // }, [params.id]);
-
   const [files, setFiles] = useState<FileItem[]>([
     { id: "1", name: "document.pdf", size: "2.5 MB", uploadDate: "2023-05-15" },
     { id: "2", name: "image.jpg", size: "1.8 MB", uploadDate: "2023-05-14" },
@@ -69,9 +49,7 @@ export default function Component({ params }: { params: { id: string } }) {
   return (
     <div className="flex flex-col h-screen bg-gray-900 text-gray-100">
       <header className="px-6 py-4 bg-gray-800">
-        <h1 className="text-2xl font-bold">
-          Project: {searchparams} Dashboard
-        </h1>
+        <h1 className="text-2xl font-bold">Project: {params.id} Dashboard</h1>
       </header>
       <main className="flex-grow p-6 overflow-hidden">
         <div className="mb-6 flex justify-between items-center">
@@ -114,7 +92,7 @@ export default function Component({ params }: { params: { id: string } }) {
                     onClick={() => removeFile(file.id)}
                     className="text-red-400 hover:text-red-300 hover:bg-red-400/20"
                   >
-                    <Trash2Icon className="h-5 w-5" />
+                    <Sparkles className="h-5 w-5" />
                     <span className="sr-only">Remove file</span>
                   </Button>
                 </div>

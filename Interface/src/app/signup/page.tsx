@@ -68,12 +68,14 @@ export default function Signup() {
         password
       );
 
+      console.log(email, password);
+
       if (userCredential) {
         // Firebase user ID
         const userId = userCredential.user.uid;
 
         // Create a new user in MongoDB
-        await addUser(userId, email, userId, []);
+        await addUser(userId, "john doe", email, []);
 
         // Send email verification
         const success = await sendEmailVerification();

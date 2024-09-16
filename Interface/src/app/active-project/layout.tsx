@@ -28,7 +28,7 @@ export default function RootLayout({
             <Aside />
 
             {/* Main Content */}
-            <div className="flex-grow overflow-y-auto h-screen">
+            <div className="flex-grow p-6 overflow-y-auto h-screen">
               {/* Header remains at the top of the main content */}
               {/* <Header user={user} /> */}
 

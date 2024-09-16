@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import {
   Trash2,
-  Edit,
   MoreVertical,
   Wand2,
   Sparkles,
@@ -20,6 +20,9 @@ import {
   Settings,
   Plus,
   RefreshCcw,
+  X,
+  Sliders,
+  ArrowUpRightFromCircle,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -82,6 +85,10 @@ const availableProjects: Project[] = [
 export default function Component() {
   const [selectedProjects, setSelectedProjects] = useState<Project[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAsidePanelOpen, setIsAsidePanelOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(
+    null
+  );
 
   const handleDeleteProject = (id: number) => {
     setSelectedProjects(
@@ -117,8 +124,13 @@ export default function Component() {
     setIsDialogOpen(false);
   };
 
+  const openAsidePanel = (id: number) => {
+    setSelectedProjectId(id);
+    setIsAsidePanelOpen(true);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 p-8">
+    <div className="min-h-screen bg-gray-900 text-gray-100 p-8 relative">
       <header className="mb-8">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-4xl font-bold text-gray-100">
@@ -191,7 +203,7 @@ export default function Component() {
           {selectedProjects.map((project) => (
             <Card
               key={project.id}
-              className="w-full bg-gray-800 border-gray-700 border-green-500"
+              className="w-full bg-gray-800 border-gray-700"
             >
               <CardHeader>
                 <CardTitle className="flex justify-between items-center text-gray-100">
@@ -235,60 +247,98 @@ export default function Component() {
                 <p className="text-sm text-gray-400 mb-4">
                   Last updated: {project.lastUpdated}
                 </p>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleAIFeature(project.id)}
-                    className="text-gray-300 hover:text-gray-100 border-gray-600 hover:bg-gray-700"
-                  >
-                    <Wand2 className="mr-2 h-4 w-4" />
-                    AI Features
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleDataCleaning(project.id)}
-                    className="text-gray-300 hover:text-gray-100 border-gray-600 hover:bg-gray-700"
-                  >
-                    <Sparkles className="mr-2 h-4 w-4" />
-                    Clean Data
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleAnalyze(project.id)}
-                    className="text-gray-300 hover:text-gray-100 border-gray-600 hover:bg-gray-700"
-                  >
-                    <BarChart2 className="mr-2 h-4 w-4" />
-                    Analyze
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handleExport(project.id)}
-                    className="text-gray-300 hover:text-gray-100 border-gray-600 hover:bg-gray-700"
-                  >
-                    <Download className="mr-2 h-4 w-4" />
-                    Export
-                  </Button>
-                </div>
               </CardContent>
-              {/* <CardFooter className="flex justify-end">
+              <CardFooter className="flex justify-end">
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleEditProject(project.id)}
-                  className="text-gray-300 hover:text-gray-100 border-gray-600 hover:bg-gray-700"
+                  onClick={() => openAsidePanel(project.id)}
+                  className="text-gray-300 hover:text-gray-100 bg-black hover:bg-gray-900 border-gray-600"
                 >
-                  <Edit className="mr-2 h-4 w-4" />
-                  Edit Project
+                  <Sliders className="mr-2 h-4 w-4" />
+                  Operations
                 </Button>
-              </CardFooter> */}
+                <div>
+                  <Link href={`/active-project/${project.id}`}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="text-gray-300 hover:text-gray-100 bg-black hover:bg-gray-900 border-gray-600"
+                    >
+                      <ArrowUpRightFromCircle className="mr-2 h-4 w-4" />
+                      Visit
+                    </Button>
+                  </Link>
+                </div>
+              </CardFooter>
             </Card>
           ))}
         </div>
       )}
+
+      {/* Right Aside Panel */}
+      <aside
+        className={`fixed right-0 top-0 h-full w-64 bg-gray-800 text-gray-100 p-4 transform transition-transform duration-300 ease-in-out ${
+          isAsidePanelOpen ? "translate-x-0" : "translate-x-full"
+        }`}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-xl font-bold">Operations</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setIsAsidePanelOpen(false)}
+            className="text-gray-300 hover:text-gray-100"
+            aria-label="Close operations panel"
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+        <div className="space-y-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              selectedProjectId && handleAIFeature(selectedProjectId)
+            }
+            className="w-full text-left justify-start bg-gray-700 hover:bg-gray-600 text-gray-100"
+          >
+            <Wand2 className="mr-2 h-4 w-4" />
+            AI Features
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              selectedProjectId && handleDataCleaning(selectedProjectId)
+            }
+            className="w-full text-left justify-start bg-gray-700 hover:bg-gray-600 text-gray-100"
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Clean Data
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() =>
+              selectedProjectId && handleAnalyze(selectedProjectId)
+            }
+            className="w-full text-left justify-start bg-gray-700 hover:bg-gray-600 text-gray-100"
+          >
+            <BarChart2 className="mr-2 h-4 w-4" />
+            Analyze
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => selectedProjectId && handleExport(selectedProjectId)}
+            className="w-full text-left justify-start bg-gray-700 hover:bg-gray-600 text-gray-100"
+          >
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+        </div>
+      </aside>
     </div>
   );
 }

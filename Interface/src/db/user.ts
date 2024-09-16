@@ -16,14 +16,15 @@ interface User {
   name: string;
   email: string;
   projects: ObjectId[]; // Projects are stored as ObjectIds
+  userId: string;
 }
 
 async function getUser(userId: string): Promise<User | null> {
   try {
     await client.connect();
-    const database = client.db("test");
+    const database = client.db("datafusion");
     const users = database.collection<User>("users");
-    const user = await users.findOne({ _id: new ObjectId(userId) });
+    const user = await users.findOne({ userId: userId });
     return user;
   } finally {
     await client.close();
@@ -38,14 +39,15 @@ async function addUser(
 ): Promise<void> {
   try {
     await client.connect();
-    const database = client.db("test");
+    const database = client.db("datafusion");
     const users = database.collection<User>("users");
     // _id is passed explicitly as userId
     await users.insertOne({
-      _id: new ObjectId(userId),
+      _id: new ObjectId(),
       name,
       email,
       projects,
+      userId,
     });
   } finally {
     await client.close();
@@ -60,10 +62,10 @@ async function updateUser(
 ): Promise<void> {
   try {
     await client.connect();
-    const database = client.db("test");
+    const database = client.db("datafusion");
     const users = database.collection<User>("users");
     await users.updateOne(
-      { _id: new ObjectId(userId) },
+      { userId: userId },
       { $set: { name, email, projects } }
     );
   } finally {
@@ -74,9 +76,9 @@ async function updateUser(
 async function deleteUser(userId: string): Promise<void> {
   try {
     await client.connect();
-    const database = client.db("test");
+    const database = client.db("datafusion");
     const users = database.collection<User>("users");
-    await users.deleteOne({ _id: new ObjectId(userId) });
+    await users.deleteOne({ userId: userId });
   } finally {
     await client.close();
   }
@@ -84,17 +86,17 @@ async function deleteUser(userId: string): Promise<void> {
 
 async function addProjectToUser(
   userId: string,
-  projectId: string
+  projectId: ObjectId
 ): Promise<void> {
   try {
     await client.connect();
-    const database = client.db("test");
+    const database = client.db("datafusion");
     const users = database.collection<User>("users");
-    const user = await users.findOne({ _id: new ObjectId(userId) });
+    const user = await users.findOne({ userId: userId });
     if (user) {
       user.projects.push(new ObjectId(projectId));
       await users.updateOne(
-        { _id: new ObjectId(userId) },
+        { userId: userId },
         { $set: { projects: user.projects } }
       );
     }
@@ -109,15 +111,15 @@ async function removeProjectFromUser(
 ): Promise<void> {
   try {
     await client.connect();
-    const database = client.db("test");
+    const database = client.db("datafusion");
     const users = database.collection<User>("users");
-    const user = await users.findOne({ _id: new ObjectId(userId) });
+    const user = await users.findOne({ userId: userId });
     if (user) {
       const index = user.projects.indexOf(new ObjectId(projectId));
       if (index > -1) {
         user.projects.splice(index, 1);
         await users.updateOne(
-          { _id: new ObjectId(userId) },
+          { userId: userId },
           { $set: { projects: user.projects } }
         );
       }

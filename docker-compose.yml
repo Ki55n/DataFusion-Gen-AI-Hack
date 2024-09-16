@@ -1,0 +1,31 @@
+version: "3.6"
+
+services:
+  fusionai:
+    build:
+      context: ./backend_dateja
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend_dateja:/application
+      - ./data:/app/data
+    env_file:
+      - ./backend_dateja/.env
+    ports:
+      - "8001:8000" # Mapping container port 8000 to host port 8001
+    networks:
+      - fusion_network
+
+  interface:
+    build:
+      context: ./interface
+      dockerfile: Dockerfile
+    volumes:
+      - ./interface:/app
+    ports:
+      - "3000:3000" # Exposing port 3000 for the Next.js app
+    networks:
+      - fusion_network
+
+networks:
+  fusion_network:
+    driver: bridge
