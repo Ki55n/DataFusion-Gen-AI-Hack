@@ -38,6 +38,12 @@ class DataFormatter:
                 return self._format_line_data(results, question)
             except Exception as e:
                 return self._format_other_visualizations(visualization, question, sql_query, results)
+            
+        if visualization == "globe":
+            try:
+                return self._format_globe_data(results, question)
+            except Exception as e:
+                return self._format_other_visualizations(visualization, question, sql_query, results)
         
         return self._format_other_visualizations(visualization, question, sql_query, results)
     

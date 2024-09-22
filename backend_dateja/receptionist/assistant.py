@@ -70,5 +70,6 @@ class VirtualAssistant:
                                               llm=self.llm_manager.llm, 
                                               agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, 
                                               verbose=True, 
-                                              agent_kwargs={"prompt":prompt})
+                                              agent_kwargs={"prompt":prompt},
+                                              handle_parsing_errors=True)
         return receptionist_agent
