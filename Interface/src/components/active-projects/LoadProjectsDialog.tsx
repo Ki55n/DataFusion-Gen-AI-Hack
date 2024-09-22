@@ -1,101 +1,110 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-export type Project = {
-  id: number;
+import { Plus } from "lucide-react";
+import { changeProjectStatus } from "@/db/project";
+
+type Project = {
+  _id: string;
   name: string;
   description: string;
-  lastUpdated: string;
+  createdAt: Date;
+  status: string;
+  files: any[];
+  userId: string;
 };
 
-export const availableProjects: Project[] = [
-  {
-    id: 1,
-    name: "Customer Data",
-    description: "Clean and normalize customer information",
-    lastUpdated: "2023-05-15",
-  },
-  {
-    id: 2,
-    name: "Sales Records",
-    description: "Remove duplicates and standardize formats",
-    lastUpdated: "2023-05-10",
-  },
-  {
-    id: 3,
-    name: "Product Catalog",
-    description: "Update product descriptions and categories",
-    lastUpdated: "2023-05-05",
-  },
-  {
-    id: 4,
-    name: "Employee Database",
-    description: "Standardize job titles and departments",
-    lastUpdated: "2023-05-20",
-  },
-  {
-    id: 5,
-    name: "Inventory Management",
-    description: "Optimize stock levels and categorization",
-    lastUpdated: "2023-05-25",
-  },
-];
 type LoadProjectsDialogProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
-  availableProjects: Project[];
-  selectedProjects: Project[];
-  onLoadProjects: (projectIds: number[]) => void;
-  onDeleteProject: (id: number) => void;
+  projects: Project[];
+  onLoadProjects: (projects: Project[]) => void;
 };
 
 export default function LoadProjectsDialog({
   isOpen,
   onOpenChange,
-  availableProjects,
-  selectedProjects,
+  projects,
   onLoadProjects,
-  onDeleteProject,
 }: LoadProjectsDialogProps) {
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+
+  const handleProjectSelection = (projectId: string) => {
+    changeProjectStatus(projectId, "active");
+    setSelectedProjects((prev) =>
+      prev.includes(projectId)
+        ? prev.filter((id) => id !== projectId)
+        : [...prev, projectId]
+    );
+  };
+
+  const handleLoadProjects = () => {
+    const projectsToLoad = projects.filter((project) =>
+      selectedProjects.includes(project._id)
+    );
+    onLoadProjects(projectsToLoad);
+    onOpenChange(false);
+    setSelectedProjects([]);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
+      <DialogTrigger asChild>
+        <Button variant="outline">
+          <Plus className="mr-2 h-4 w-4" />
+          Load Projects
+        </Button>
+      </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-gray-800 text-gray-100">
         <DialogHeader>
-          <DialogTitle>Load Projects</DialogTitle>
+          <DialogTitle>Your Projects</DialogTitle>
           <DialogDescription>
-            Select projects to load into your dashboard.
+            Select projects to add to your dashboard.
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="mt-4 h-[300px] pr-4">
-          {availableProjects.map((project) => (
-            <div key={project.id} className="flex items-center space-x-2 mb-4">
+          {projects.map((project) => (
+            <div key={project._id} className="flex items-center space-x-2 mb-4">
               <Checkbox
-                id={`project-${project.id}`}
-                onCheckedChange={(checked) => {
-                  if (checked) {
-                    onLoadProjects([project.id]);
-                  } else {
-                    onDeleteProject(project.id);
-                  }
-                }}
-                checked={selectedProjects.some((p) => p.id === project.id)}
+                id={project._id}
+                checked={selectedProjects.includes(project._id)}
+                onCheckedChange={() => handleProjectSelection(project._id)}
               />
               <label
-                htmlFor={`project-${project.id}`}
-                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                htmlFor={project._id}
+                className="text-sm font-medium flex items-center space-x-2"
               >
-                {project.name}
+                <span>{project.name}</span>
+                <span
+                  className={`text-xs px-2 py-1 rounded ${
+                    project.status === "active" ? "bg-green-500" : "bg-gray-500"
+                  }`}
+                >
+                  {project.status}
+                </span>
               </label>
             </div>
           ))}
         </ScrollArea>
+        <div className="mt-4 flex justify-end">
+          <Button
+            onClick={handleLoadProjects}
+            disabled={selectedProjects.length === 0}
+          >
+            Add Selected Projects
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );

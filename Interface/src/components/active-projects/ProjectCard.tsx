@@ -22,49 +22,21 @@ import {
   ArrowUpRightFromCircle,
 } from "lucide-react";
 import Link from "next/link";
-export type Project = {
-  id: number;
+
+type Project = {
+  _id: string;
   name: string;
   description: string;
-  lastUpdated: string;
+  createdAt: Date;
+  status: string;
+  files: any[];
+  userId: string;
 };
 
-export const availableProjects: Project[] = [
-  {
-    id: 1,
-    name: "Customer Data",
-    description: "Clean and normalize customer information",
-    lastUpdated: "2023-05-15",
-  },
-  {
-    id: 2,
-    name: "Sales Records",
-    description: "Remove duplicates and standardize formats",
-    lastUpdated: "2023-05-10",
-  },
-  {
-    id: 3,
-    name: "Product Catalog",
-    description: "Update product descriptions and categories",
-    lastUpdated: "2023-05-05",
-  },
-  {
-    id: 4,
-    name: "Employee Database",
-    description: "Standardize job titles and departments",
-    lastUpdated: "2023-05-20",
-  },
-  {
-    id: 5,
-    name: "Inventory Management",
-    description: "Optimize stock levels and categorization",
-    lastUpdated: "2023-05-25",
-  },
-];
 type ProjectCardProps = {
   project: Project;
-  onDelete: (id: number) => void;
-  onOpenAsidePanel: (id: number) => void;
+  onDelete: (id: string) => void;
+  onOpenAsidePanel: (id: string) => void;
 };
 
 export default function ProjectCard({
@@ -93,7 +65,7 @@ export default function ProjectCard({
             >
               <DropdownMenuItem
                 onClick={() =>
-                  console.log(`Syncing project with id: ${project.id}`)
+                  console.log(`Syncing project with id: ${project._id}`)
                 }
                 className="hover:bg-gray-700"
               >
@@ -101,7 +73,7 @@ export default function ProjectCard({
                 Sync
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => onDelete(project.id)}
+                onClick={() => onDelete(project._id)}
                 className="hover:bg-gray-700"
               >
                 <Trash2 className="mr-2 h-4 w-4" />
@@ -116,21 +88,22 @@ export default function ProjectCard({
       </CardHeader>
       <CardContent>
         <p className="text-sm text-gray-400 mb-4">
-          Last updated: {project.lastUpdated}
+          Created: {new Date(project.createdAt).toLocaleDateString()}
         </p>
+        <p className="text-sm text-gray-400 mb-4">Status: {project.status}</p>
       </CardContent>
       <CardFooter className="flex justify-end">
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onOpenAsidePanel(project.id)}
+          onClick={() => onOpenAsidePanel(project._id)}
           className="text-gray-300 hover:text-gray-100 bg-black hover:bg-gray-900 border-gray-600"
         >
           <Sliders className="mr-2 h-4 w-4" />
           Operations
         </Button>
         <div>
-          <Link href={`/active-project/${project.id}`}>
+          <Link href={`/project/${project._id}`}>
             <Button
               variant="outline"
               size="sm"

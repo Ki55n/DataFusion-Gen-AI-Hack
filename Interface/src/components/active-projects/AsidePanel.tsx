@@ -5,7 +5,7 @@ import { X, Wand2, Sparkles, BarChart2, Download } from "lucide-react";
 type AsidePanelProps = {
   isOpen: boolean;
   onClose: () => void;
-  selectedProjectId: number | null;
+  selectedProjectId: string | null;
 };
 
 export default function AsidePanel({

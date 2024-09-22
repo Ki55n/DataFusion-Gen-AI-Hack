@@ -98,3 +98,26 @@ export async function getProjectDetails(userId: string, projectId: string) {
     await client.close();
   }
 }
+
+export async function changeProjectStatus(
+  projectId: string,
+  newStatus: string
+) {
+  try {
+    await client.connect();
+    const database = client.db("datafusion");
+    const projects = database.collection("projects");
+    const query = { _id: new ObjectId(projectId) };
+    const update = { $set: { status: newStatus } };
+    const result = await projects.updateOne(query, update);
+    if (result.modifiedCount === 1) {
+      console.log("Successfully updated project status.");
+    } else {
+      console.error("Failed to update project status.");
+    }
+  } catch (err) {
+    console.error("Error updating project status:", err);
+  } finally {
+    await client.close();
+  }
+}
