@@ -40,10 +40,10 @@ class WorkflowManager:
     def returnGraph(self):
         return self.create_workflow().compile()
 
-    def run_sql_agent(self, question: str, uuid: str) -> dict:
+    def run_sql_agent(self, question: str, file_uuid: str, project_uuid: str) -> dict:
         """Run the SQL agent workflow and return the formatted answer and visualization recommendation."""
         app = self.create_workflow().compile()
-        result = app.invoke({"question": question, "uuid": uuid})
+        result = app.invoke({"question": question, "file_uuid": file_uuid, "project_uuid": project_uuid})
         return {
             "answer": result['answer'],
             "visualization": result['visualization'],

@@ -1,6 +1,7 @@
 import requests
 import os
 from typing import List, Any
+from urllib.parse import urlencode
 
 class DatabaseManager:
     def __init__(self, endpoint_url):
@@ -16,13 +17,30 @@ class DatabaseManager:
             return response.json()['schema']
         except requests.RequestException as e:
             raise Exception(f"Error fetching schema: {str(e)}")
+        
+    def get_schemas(self, uuids: List[str], project_uuid: str) -> str:
+        """Retrieve the database schema."""
+        try:
+            # Prepare the query parameters
+            params = [('file_uuids', uuid) for uuid in uuids]
+            params.append(('project_uuid', project_uuid))
+            query_string = urlencode(params)
 
-    def execute_query(self, uuid: str, query: str) -> List[Any]:
+            # Make the GET request
+            response = requests.get(
+                f"{self.endpoint_url}/get-schemas?{query_string}"
+            )
+            response.raise_for_status()
+            return response.json()['schema']
+        except requests.RequestException as e:
+            raise Exception(f"Error fetching schema: {str(e)}")
+
+    def execute_query(self, file_uuid: str, query: str) -> List[Any]:
         """Execute SQL query on the remote database and return results."""
         try:
             response = requests.post(
                 f"{self.endpoint_url}/execute-query",
-                json={"uuid": uuid, "query": query}
+                json={"file_uuid": file_uuid, "query": query}
             )
             response.raise_for_status()
             return response.json()['results']
