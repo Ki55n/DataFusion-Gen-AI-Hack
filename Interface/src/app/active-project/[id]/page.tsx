@@ -4,7 +4,9 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileIcon, Sparkles, UploadIcon, X } from "lucide-react";
+import { FileIcon, Sparkles, UploadIcon, X, Save } from "lucide-react";
+import BarChart from "@/components/visualization/BarChart";
+import { saveVisualization, Visualization } from "@/db/visualizer";
 
 interface FileItem {
   id: string;
@@ -17,6 +19,8 @@ interface ChatMessage {
   id: string;
   sender: "user" | "ai";
   content: string;
+  visualization?: string;
+  formatted_data_for_visualization?: any;
 }
 
 interface ComponentProps {
@@ -26,7 +30,7 @@ interface ComponentProps {
 export default function Component({ params }: ComponentProps) {
   const [files, setFiles] = useState<FileItem[]>([
     {
-      id: "5976d09b-c5d2-408e-9ff8-8dfbe189d649",
+      id: "04ac97c7-86d4-4dfc-bd9b-361b16b7258e",
       name: "document.pdf",
       size: "2.5 MB",
       uploadDate: "2023-05-15",
@@ -118,6 +122,9 @@ export default function Component({ params }: ComponentProps) {
           id: (Date.now() + 1).toString(),
           sender: "ai",
           content: data.answer || "Sorry, I couldn't process that request.",
+          visualization: data.visualization,
+          formatted_data_for_visualization:
+            data.formatted_data_for_visualization,
         };
         setChatMessages((prev) => ({
           ...prev,
@@ -140,6 +147,39 @@ export default function Component({ params }: ComponentProps) {
     }
   };
 
+  const handleSaveVisualization = async (message: ChatMessage) => {
+    if (
+      message.visualization &&
+      message.formatted_data_for_visualization &&
+      selectedFileId
+    ) {
+      const visualizationData: Omit<Visualization, "_id"> = {
+        userId: "user123", // Replace with actual user ID
+        fileId: selectedFileId,
+        fileName:
+          files.find((file) => file.id === selectedFileId)?.name || "Unknown",
+        visualizationType: message.visualization,
+        data: message.formatted_data_for_visualization,
+        description: message.content,
+        layout: {
+          i: `viz-${Date.now()}`,
+          x: 0,
+          y: 0,
+          w: 6,
+          h: 4,
+        },
+      };
+
+      const result = await saveVisualization(visualizationData);
+      if (result) {
+        console.log("Visualization saved successfully");
+        // You can add a notification or update UI here to indicate successful save
+      } else {
+        console.error("Failed to save visualization");
+        // You can add error handling or user notification here
+      }
+    }
+  };
   return (
     <div className="flex h-screen bg-gray-900 text-gray-100">
       <div className="flex-grow flex flex-col">
@@ -239,6 +279,28 @@ export default function Component({ params }: ComponentProps) {
                 >
                   {message.content}
                 </div>
+                {message.visualization === "horizontal_bar" && (
+                  <div className="mt-2">
+                    <BarChart
+                      data={message.formatted_data_for_visualization.values[0].data.map(
+                        (value: any, index: any) => ({
+                          label:
+                            message.formatted_data_for_visualization.labels[
+                              index
+                            ],
+                          value: value,
+                        })
+                      )}
+                    />
+                    <Button
+                      onClick={() => handleSaveVisualization(message)}
+                      className="mt-2 bg-green-600 hover:bg-green-700"
+                    >
+                      <Save className="mr-2 h-4 w-4" />
+                      Save to Visualizer
+                    </Button>
+                  </div>
+                )}
               </div>
             ))}
           </ScrollArea>

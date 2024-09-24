@@ -103,7 +103,7 @@ export default function ProjectCard({
           Operations
         </Button>
         <div>
-          <Link href={`/project/${project._id}`}>
+          <Link href={`/active-project/${project._id}`}>
             <Button
               variant="outline"
               size="sm"
