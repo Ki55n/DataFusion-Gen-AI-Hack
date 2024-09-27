@@ -3,6 +3,7 @@ from backend_dateja.my_agent.State import InputState, OutputState
 from backend_dateja.my_agent.SQLAgent import SQLAgent
 from backend_dateja.my_agent.DataFormatter import DataFormatter
 from langgraph.graph import END
+from typing import List
 
 class WorkflowManager:
     def __init__(self, api_key: str, endpoint_url:str):
@@ -40,10 +41,10 @@ class WorkflowManager:
     def returnGraph(self):
         return self.create_workflow().compile()
 
-    def run_sql_agent(self, question: str, file_uuid: str, project_uuid: str) -> dict:
+    def run_sql_agent(self, question: str, file_uuids: List[str], project_uuid: str) -> dict:
         """Run the SQL agent workflow and return the formatted answer and visualization recommendation."""
         app = self.create_workflow().compile()
-        result = app.invoke({"question": question, "file_uuid": file_uuid, "project_uuid": project_uuid})
+        result = app.invoke({"question": question, "file_uuids": file_uuids, "project_uuid": project_uuid})
         return {
             "answer": result['answer'],
             "visualization": result['visualization'],

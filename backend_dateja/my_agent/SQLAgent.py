@@ -12,7 +12,7 @@ class SQLAgent:
     def parse_question(self, state: dict) -> dict:
         """Parse user question and identify relevant tables and columns."""
         question = state['question']
-        schema = self.db_manager.get_schemas(uuids=state['file_uuid'], project_uuid=state['project_uuid'])
+        schema = self.db_manager.get_schemas(uuids=state['file_uuids'], project_uuid=state['project_uuid'])
 
         prompt = ChatPromptTemplate.from_messages([
             ("system", '''You are a data analyst that can help summarize SQL tables and parse user questions about a database. 
