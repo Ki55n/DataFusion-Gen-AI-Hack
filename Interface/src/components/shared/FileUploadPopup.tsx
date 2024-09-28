@@ -5,6 +5,7 @@ import { XIcon } from "lucide-react";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
+import { changeProjectStatus } from "@/db/project";
 
 interface FileItem {
   file_uuid: string;
@@ -47,6 +48,8 @@ async function uploadFile(
       dateUploaded: new Date(),
       file_uuid: file_uuid.file_uuid,
     };
+
+    await changeProjectStatus(projectId, "inactive");
 
     await uploadFileToDb(userId, projectId, description, filedata);
 

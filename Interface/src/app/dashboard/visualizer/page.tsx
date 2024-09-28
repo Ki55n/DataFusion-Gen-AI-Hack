@@ -1,14 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Responsive, WidthProvider, Layout } from "react-grid-layout";
-import "react-grid-layout/css/styles.css";
-import "react-resizable/css/styles.css";
+import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
-import LineGraph from "@/components/visualization/LineGraph";
-import PieChart from "@/components/visualization/PieChart";
-import BarChart from "@/components/visualization/BarChart";
-import GlobeComponent from "@/components/visualization/vGlobe";
 import {
   getVisualizations,
   updateVisualizationLayout,
@@ -17,16 +11,45 @@ import {
 import { Volume2, Square } from "lucide-react";
 import { UserAuth } from "@/app/context/AuthContext";
 
-const ResponsiveGridLayout = WidthProvider(Responsive);
+// Dynamically import components that rely on browser APIs
+const ResponsiveGridLayout = dynamic(
+  () =>
+    import("react-grid-layout").then((mod) => {
+      const { Responsive, WidthProvider } = mod;
+      return WidthProvider(Responsive);
+    }),
+  { ssr: false }
+);
+
+const LineGraph = dynamic(
+  () => import("@/components/visualization/LineGraph"),
+  { ssr: false }
+);
+const PieChart = dynamic(() => import("@/components/visualization/PieChart"), {
+  ssr: false,
+});
+const BarChart = dynamic(() => import("@/components/visualization/BarChart"), {
+  ssr: false,
+});
+const GlobeComponent = dynamic(
+  () => import("@/components/visualization/vGlobe"),
+  { ssr: false }
+);
+
+type Layout = {
+  i: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
 
 type Layouts = {
   [key: string]: Layout[];
 };
 
 export default function Dashboard() {
-  const [layouts, setLayouts] = useState<Layouts>({
-    lg: [],
-  });
+  const [layouts, setLayouts] = useState<Layouts>({ lg: [] });
   const [visualizations, setVisualizations] = useState<Visualization[]>([]);
   const [isEditing, setIsEditing] = useState(false);
   const [isDraggable, setIsDraggable] = useState(false);
@@ -34,26 +57,27 @@ export default function Dashboard() {
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const { user }: any = UserAuth();
 
-  const userId = user.uid;
+  const userId = user?.uid;
 
   useEffect(() => {
     const fetchVisualizations = async () => {
-      const fetchedVisualizations = await getVisualizations(userId);
-      setVisualizations(fetchedVisualizations);
+      if (userId) {
+        const fetchedVisualizations = await getVisualizations(userId);
+        setVisualizations(fetchedVisualizations);
 
-      // Create layouts based on fetched visualizations
-      const newLayouts: Layout[] = fetchedVisualizations.map((viz) => ({
-        i: viz._id,
-        x: viz.layout.x,
-        y: viz.layout.y,
-        w: viz.layout.w,
-        h: viz.layout.h,
-      }));
-      setLayouts({ lg: newLayouts });
+        const newLayouts: Layout[] = fetchedVisualizations.map((viz) => ({
+          i: viz._id,
+          x: viz.layout.x,
+          y: viz.layout.y,
+          w: viz.layout.w,
+          h: viz.layout.h,
+        }));
+        setLayouts({ lg: newLayouts });
+      }
     };
 
     fetchVisualizations();
-  }, []);
+  }, [userId]);
 
   const renderVisualization = (visualization: Visualization) => {
     switch (visualization.visualizationType) {
@@ -104,30 +128,27 @@ export default function Dashboard() {
   };
 
   const speakChartData = (id: string, description: string) => {
-    if ("speechSynthesis" in window) {
+    if (typeof window !== "undefined" && "speechSynthesis" in window) {
       if (speakingId === id) {
-        // If the same chart is speaking, stop it
-        speechSynthesis.cancel();
+        window.speechSynthesis.cancel();
         setSpeakingId(null);
       } else {
-        // If a different chart is speaking, stop the previous one and start the new one
-        speechSynthesis.cancel();
+        window.speechSynthesis.cancel();
         setSpeakingId(id);
 
         const utterance = new SpeechSynthesisUtterance(description);
-        utterance.rate = 0.7; // Slow down the voice tempo
+        utterance.rate = 0.7;
 
-        // Get the list of voices and select the one that contains 'Zira' in the name
-        const voices = speechSynthesis.getVoices();
+        const voices = window.speechSynthesis.getVoices();
         const ziraVoice =
-          voices.find((voice) => voice.name.includes("Zira")) || voices[0]; // Fallback to the first available voice
+          voices.find((voice) => voice.name.includes("Zira")) || voices[0];
 
         if (ziraVoice) {
           utterance.voice = ziraVoice;
         }
 
         utterance.onend = () => setSpeakingId(null);
-        speechSynthesis.speak(utterance);
+        window.speechSynthesis.speak(utterance);
       }
     }
   };
@@ -142,44 +163,48 @@ export default function Dashboard() {
           <Button onClick={handleEditLayout}>Edit Layout</Button>
         )}
       </div>
-      <ResponsiveGridLayout
-        className="layout"
-        layouts={layouts}
-        breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
-        cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
-        onLayoutChange={handleLayoutChange}
-        isDraggable={isDraggable}
-        isResizable={isResizable}
-      >
-        {visualizations.map((visualization) => (
-          <div
-            key={visualization._id}
-            className="bg-gray-800 p-4 rounded shadow"
-          >
-            <h2 className="text-lg font-bold mb-2">{visualization.fileName}</h2>
-            <Button
-              variant="outline"
-              size="icon"
-              className="absolute top-2 right-2 z-10 bg-gray-900"
-              onClick={() =>
-                speakChartData(visualization._id, visualization.description)
-              }
+      {typeof window !== "undefined" && (
+        <ResponsiveGridLayout
+          className="layout"
+          layouts={layouts}
+          breakpoints={{ lg: 1200, md: 996, sm: 768, xs: 480, xxs: 0 }}
+          cols={{ lg: 12, md: 10, sm: 6, xs: 4, xxs: 2 }}
+          onLayoutChange={handleLayoutChange}
+          isDraggable={isDraggable}
+          isResizable={isResizable}
+        >
+          {visualizations.map((visualization) => (
+            <div
+              key={visualization._id}
+              className="bg-gray-800 p-4 rounded shadow"
             >
-              {speakingId === visualization._id ? (
-                <Square className="h-4 w-4" />
-              ) : (
-                <Volume2 className="h-4 w-4" />
-              )}
-              <span className="sr-only">
-                {speakingId === visualization._id
-                  ? "Stop speaking"
-                  : "Speak chart data"}
-              </span>
-            </Button>
-            {renderVisualization(visualization)}
-          </div>
-        ))}
-      </ResponsiveGridLayout>
+              <h2 className="text-lg font-bold mb-2">
+                {visualization.fileName}
+              </h2>
+              <Button
+                variant="outline"
+                size="icon"
+                className="absolute top-2 right-2 z-10 bg-gray-900"
+                onClick={() =>
+                  speakChartData(visualization._id, visualization.description)
+                }
+              >
+                {speakingId === visualization._id ? (
+                  <Square className="h-4 w-4" />
+                ) : (
+                  <Volume2 className="h-4 w-4" />
+                )}
+                <span className="sr-only">
+                  {speakingId === visualization._id
+                    ? "Stop speaking"
+                    : "Speak chart data"}
+                </span>
+              </Button>
+              {renderVisualization(visualization)}
+            </div>
+          ))}
+        </ResponsiveGridLayout>
+      )}
     </div>
   );
 }
