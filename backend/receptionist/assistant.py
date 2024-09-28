@@ -7,8 +7,8 @@ from langchain.agents import initialize_agent, Tool
 from langchain.agents.agent_types import AgentType
 from langchain_core.prompts import ChatPromptTemplate
 
-from backend_dateja.my_agent.LLMManager import LLMManager
-from backend_dateja.receptionist.helper_funcs import fix_json
+from backend.my_agent.LLMManager import LLMManager
+from backend.receptionist.helper_funcs import fix_json
 
 def extract_content(message):
     message = fix_json(message)

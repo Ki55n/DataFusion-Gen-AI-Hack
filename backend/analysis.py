@@ -6,7 +6,7 @@ from plotly.subplots import make_subplots
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
 
-from backend_dateja.my_agent.LLMManager import LLMManager
+from backend.my_agent.LLMManager import LLMManager
 
 logger = logging.getLogger(__name__)
 

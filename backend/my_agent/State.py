@@ -11,6 +11,7 @@ class InputState(TypedDict):
     sql_query: str
     results: List[Any]
     visualization: Annotated[str, operator.add]
+    formatted_data_for_visualization: Dict[str, Any]
 
 class OutputState(TypedDict):
     parsed_question: Dict[str, Any]
@@ -24,4 +25,5 @@ class OutputState(TypedDict):
     error: str
     visualization: Annotated[str, operator.add]
     visualization_reason: Annotated[str, operator.add]
+    visualization_summary: str
     formatted_data_for_visualization: Dict[str, Any]

@@ -1,7 +1,7 @@
 from langgraph.graph import StateGraph
-from backend_dateja.my_agent.State import InputState, OutputState
-from backend_dateja.my_agent.SQLAgent import SQLAgent
-from backend_dateja.my_agent.DataFormatter import DataFormatter
+from backend.my_agent.State import InputState, OutputState
+from backend.my_agent.SQLAgent import SQLAgent
+from backend.my_agent.DataFormatter import DataFormatter
 from langgraph.graph import END
 from typing import List
 
@@ -23,6 +23,7 @@ class WorkflowManager:
         workflow.add_node("format_results", self.sql_agent.format_results)
         workflow.add_node("choose_visualization", self.sql_agent.choose_visualization)
         workflow.add_node("format_data_for_visualization", self.data_formatter.format_data_for_visualization)
+        workflow.add_node("summarize_visualization", self.data_formatter.summarize_visualization)
         
         # Define edges
         workflow.add_edge("parse_question", "get_unique_nouns")
@@ -32,7 +33,9 @@ class WorkflowManager:
         workflow.add_edge("execute_sql", "format_results")
         workflow.add_edge("execute_sql", "choose_visualization")
         workflow.add_edge("choose_visualization", "format_data_for_visualization")
-        workflow.add_edge("format_data_for_visualization", END)
+        workflow.add_edge("format_data_for_visualization", "summarize_visualization")
+        workflow.add_edge("summarize_visualization", END)
+        # workflow.add_edge("format_results", "summarize_visualization")
         workflow.add_edge("format_results", END)
         workflow.set_entry_point("parse_question")
 
