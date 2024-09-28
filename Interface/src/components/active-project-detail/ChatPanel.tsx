@@ -6,6 +6,7 @@ import { Save } from "lucide-react";
 import BarChart from "@/components/visualization/BarChart";
 import { saveVisualization, Visualization } from "@/db/visualizer";
 import Component from "../visualization/PieChart";
+import { UserAuth } from "@/app/context/AuthContext";
 
 interface ChatMessage {
   id: string;
@@ -29,6 +30,8 @@ export function ChatPanel({
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [currentMessage, setCurrentMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const { user }: any = UserAuth();
 
   const sendMessage = async () => {
     if (currentMessage.trim() && selectedFileIds.length > 0) {
@@ -95,7 +98,7 @@ export function ChatPanel({
       selectedFileIds.length > 0
     ) {
       const visualizationData: Omit<Visualization, "_id"> = {
-        userId: "user123", // Replace with actual user ID
+        userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
         fileName:
           files.find((file) => file.id === selectedFileIds[0])?.name ||

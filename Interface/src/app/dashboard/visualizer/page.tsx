@@ -15,6 +15,7 @@ import {
   Visualization,
 } from "@/db/visualizer";
 import { Volume2, Square } from "lucide-react";
+import { UserAuth } from "@/app/context/AuthContext";
 
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
@@ -31,10 +32,12 @@ export default function Dashboard() {
   const [isDraggable, setIsDraggable] = useState(false);
   const [isResizable, setIsResizable] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const { user }: any = UserAuth();
+
+  const userId = user.uid;
 
   useEffect(() => {
     const fetchVisualizations = async () => {
-      const userId = "user123"; // Replace with actual user ID, e.g., from authentication
       const fetchedVisualizations = await getVisualizations(userId);
       setVisualizations(fetchedVisualizations);
 
