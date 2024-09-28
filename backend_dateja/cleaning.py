@@ -35,6 +35,7 @@ class AdvancedDataPipeline:
 
                     # Remove extra spaces
                     self.df[col] = self.df[col].str.replace(r"\s+", " ", regex=True)
+            logger.info("Handled inconsistent formats by removing special characters (except commas and periods) from text columns.")
             return (
                 self.df,
                 None,
@@ -62,6 +63,7 @@ class AdvancedDataPipeline:
                     )
                 elif self.df[column].dtype == bool:
                     self.df[column] = self.df[column].fillna(False)
+            logger.info("Handled missing values in all columns.")
             return self.df, None, "Handled missing values in all columns."
         except Exception as e:
             logger.error(f"Error in handle_missing_values: {str(e)}")
@@ -147,7 +149,7 @@ class AdvancedDataPipeline:
                     if col in top_features or col.startswith("PC_")
                 ]
             ]
-
+            logger.info(f"Reduced dimensions from {len(numeric_columns)} to {len(self.df.columns)} columns.")
             return (
                 self.df,
                 None,
@@ -169,3 +171,11 @@ class AdvancedDataPipeline:
             return self.handle_high_dimensionality()
         else:
             return self.df, "Invalid action.", None
+        
+    def run_all(self):
+        self.handle_inconsistent_formats()
+        self.handle_missing_values()
+        # self.handle_duplicates()
+        # self.handle_high_dimensionality()
+        
+        return self.df, "Data cleaning finished.", None

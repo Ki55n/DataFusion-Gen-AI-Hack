@@ -4,7 +4,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAI
 
 class LLMManager:
     def __init__(self, api_key):
-        model_name = "gemini-1.5-flash"
+        model_name = "gemini-1.5-pro" #gemini-1.0-pro #"gemini-1.5-flash"
         temperature = 0.0
         verbose = True
 

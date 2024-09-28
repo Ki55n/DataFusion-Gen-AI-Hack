@@ -8,4 +8,11 @@ langchain-google-genai
 tabulate
 pandas
 jsonschema
+uvicorn
+fuzzywuzzy==0.18.0
+scikit-learn==1.5.2
+plotly==5.3.1
+aiohttp
+markdown2
+weasyprint
 pysqlite3
