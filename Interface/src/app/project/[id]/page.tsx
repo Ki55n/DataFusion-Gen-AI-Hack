@@ -45,7 +45,7 @@ async function getProjectFiles(
 
 export default function Component({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
-  const { user }: any = UserAuth();
+  const { user, loading: authLoading }: any = UserAuth(); // Use 'loading' from auth context
   const router = useRouter();
 
   const [projectName, setProjectName] = useState<string>("");
@@ -53,10 +53,10 @@ export default function Component({ params }: { params: { id: string } }) {
   const [isUploadPopupOpen, setIsUploadPopupOpen] = useState(false);
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/login"); // Redirect to the login page if not authenticated
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     const fetchProjectDetails = async () => {
