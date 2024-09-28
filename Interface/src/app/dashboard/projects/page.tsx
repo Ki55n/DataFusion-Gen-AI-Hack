@@ -39,8 +39,7 @@ import { Textarea } from "@/components/ui/textarea";
 import Link from "next/link";
 import { createProject, getProjectsByUserId } from "@/db/project";
 import { UserAuth } from "@/app/context/AuthContext";
-import { useRouter } from "next/router";
-import { redirect } from "next/navigation";
+import { useRouter, redirect } from "next/navigation";
 import { File } from "@/db/project";
 
 interface Project {
@@ -59,6 +58,13 @@ export default function Component() {
 
   const [isOpen, setIsOpen] = useState(false);
   const [newProject, setNewProject] = useState({ name: "", description: "" });
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login"); // Redirect to the login page if not authenticated
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const fetchProjects = async () => {

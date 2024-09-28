@@ -10,6 +10,7 @@ import {
 } from "@/db/visualizer";
 import { Volume2, Square } from "lucide-react";
 import { UserAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 // Dynamically import components that rely on browser APIs
 const ResponsiveGridLayout = dynamic(
@@ -55,7 +56,14 @@ export default function Dashboard() {
   const [isDraggable, setIsDraggable] = useState(false);
   const [isResizable, setIsResizable] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const router = useRouter();
   const { user }: any = UserAuth();
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login"); // Redirect to the login page if not authenticated
+    }
+  }, [user, router]);
 
   const userId = user?.uid;
 

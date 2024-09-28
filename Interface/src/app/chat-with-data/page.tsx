@@ -7,7 +7,7 @@ import Hero from "@/components/chat/Hero";
 import SimilarTopics from "@/components/chat/SimilarTopics";
 import Sources from "@/components/chat/Sources";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   createParser,
   ParsedEvent,
@@ -15,6 +15,8 @@ import {
 } from "eventsource-parser";
 import { ArrowLeft, ChevronLeft, Sidebar } from "lucide-react";
 import Asidebar from "@/components/chat/Asidebar";
+import { UserAuth } from "../context/AuthContext";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const [isOpen, setIsOpen] = useState(true);
@@ -29,6 +31,15 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+
+  const { user }: any = UserAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login"); // Redirect to the login page if not authenticated
+    }
+  }, [user, router]);
 
   const handleDisplayResult = async (newQuestion?: string) => {
     newQuestion = newQuestion || promptValue;

@@ -14,36 +14,30 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = {
-    name: "mamoon",
-    email: "mamoom23@gmail.com",
-    avatar: "/path/to/avatar.jpg",
-  };
-
   return (
     <html>
       <body className="dark text-foreground bg-gray-900">
         <Providers>
-          <main className="flex h-screen">
-            {/* Fixed Sidebar */}
-            <Aside />
+          <AuthContextProvider>
+            <main className="flex h-screen">
+              {/* Fixed Sidebar */}
+              <Aside />
 
-            {/* Main Content */}
-            <div className="flex-grow overflow-y-auto h-screen">
-              {/* Header remains at the top of the main content */}
-              {/* <Header user={user} /> */}
+              {/* Main Content */}
+              <div className="flex-grow overflow-y-auto h-screen">
+                {/* Header remains at the top of the main content */}
+                {/* <Header user={user} /> */}
 
-              {/* Children content area */}
-              <AuthContextProvider>
+                {/* Children content area */}
                 <div className="flex-grow">{children}</div>
-              </AuthContextProvider>
-            </div>
+              </div>
 
-            {/* Chatbot fixed button */}
-            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
-              Chatbot
-            </div>
-          </main>
+              {/* Chatbot fixed button */}
+              <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
+                Chatbot
+              </div>
+            </main>
+          </AuthContextProvider>
         </Providers>
       </body>
     </html>

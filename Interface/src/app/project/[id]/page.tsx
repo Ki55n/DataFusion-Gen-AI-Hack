@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileIcon, Trash2Icon, UploadIcon, XIcon } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { UserAuth } from "@/app/context/AuthContext";
 import { getFilesByUserIdProjectId, uploadFileToDb } from "@/db/files";
 import { FileUploadPopup } from "@/components/shared/FileUploadPopup";
@@ -46,10 +46,17 @@ async function getProjectFiles(
 export default function Component({ params }: { params: { id: string } }) {
   const searchParams = useSearchParams();
   const { user }: any = UserAuth();
+  const router = useRouter();
 
   const [projectName, setProjectName] = useState<string>("");
   const [files, setFiles] = useState<FileItem[]>([]);
   const [isUploadPopupOpen, setIsUploadPopupOpen] = useState(false);
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login"); // Redirect to the login page if not authenticated
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const fetchProjectDetails = async () => {

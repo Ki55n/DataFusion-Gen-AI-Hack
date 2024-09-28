@@ -5,6 +5,7 @@ import { FileList } from "@/components/active-project-detail/FileList";
 import { useState, useEffect } from "react";
 import { getFilesByUserIdProjectId } from "@/db/files";
 import { UserAuth } from "@/app/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 interface FileItem {
   file_uuid: string;
@@ -22,6 +23,13 @@ export default function Component({ params }: ComponentProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
   const { user }: any = UserAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login"); // Redirect to the login page if not authenticated
+    }
+  }, [user, router]);
 
   useEffect(() => {
     const fetchFiles = async () => {
