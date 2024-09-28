@@ -60,6 +60,8 @@ export default function Component() {
   const [newProject, setNewProject] = useState({ name: "", description: "" });
   const router = useRouter();
 
+  console.log(user);
+
   useEffect(() => {
     if (!user) {
       router.push("/login"); // Redirect to the login page if not authenticated

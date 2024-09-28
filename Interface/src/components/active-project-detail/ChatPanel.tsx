@@ -7,6 +7,7 @@ import BarChart from "@/components/visualization/BarChart";
 import { saveVisualization, Visualization } from "@/db/visualizer";
 import Component from "../visualization/PieChart";
 import { UserAuth } from "@/app/context/AuthContext";
+import LineGraph from "../visualization/LineGraph";
 
 interface ChatMessage {
   id: string;
@@ -184,6 +185,19 @@ export function ChatPanel({
                     (item: any) => ({
                       label: item.labels,
                       value: item.values,
+                    })
+                  )}
+                />
+              </div>
+            )}
+
+            {message.visualization == "scatter" && (
+              <div>
+                <LineGraph
+                  data={message.formatted_data_for_visualization.series[0].data.map(
+                    (item: any) => ({
+                      label: item.x,
+                      value: item.y,
                     })
                   )}
                 />
