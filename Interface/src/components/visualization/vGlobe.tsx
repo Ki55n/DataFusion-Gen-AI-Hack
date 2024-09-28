@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback } from "react";
+import React, { useMemo, useCallback, useRef, useEffect } from "react";
 import Globe from "react-globe.gl";
 import * as THREE from "three";
 
@@ -8,16 +8,21 @@ interface DataPoint {
   lat: number;
   lng: number;
   city: string;
-  population: number;
 }
 
-interface GlobeProps {
-  data: DataPoint[];
-}
+const data: DataPoint[] = [
+  { lat: -22.9068, lng: -43.1729, city: "Rio de Janeiro" },
+  { lat: 25.2048, lng: 55.2708, city: "Dubai" },
+  { lat: 40.7128, lng: -74.006, city: "New York City" },
+  { lat: 19.076, lng: 72.8777, city: "Mumbai" },
+  { lat: 51.5074, lng: -0.1278, city: "London" },
+];
 
-export default function GlobeComponent({ data }: GlobeProps) {
+export default function CustomerLocationGlobe() {
+  const globeRef = useRef<any>();
+
   const globeMaterial = useMemo(() => {
-    const material = new THREE.MeshPhongMaterial();
+    const material = new THREE.MeshPhongMaterial({ color: "white" });
     material.bumpScale = 10;
     new THREE.TextureLoader().load(
       "//unpkg.com/three-globe/example/img/earth-topology.png",
@@ -29,70 +34,105 @@ export default function GlobeComponent({ data }: GlobeProps) {
     return material;
   }, []);
 
-  const getPointColor = useCallback((d: DataPoint) => {
-    return d.population > 1000000
-      ? "rgba(255,165,0,0.8)"
-      : "rgba(255,255,255,0.8)";
+  const customGlobeImage = useCallback((context: CanvasRenderingContext2D) => {
+    context.beginPath();
+    context.arc(512, 512, 500, 0, 2 * Math.PI);
+    context.fillStyle = "rgba(0, 0, 0, 0.8)";
+    context.fill();
+
+    // Add more white dots for a brighter appearance
+    for (let i = 0; i < 20000; i++) {
+      const x = Math.random() * 1024;
+      const y = Math.random() * 1024;
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(x - 512, 2) + Math.pow(y - 512, 2)
+      );
+      if (distanceFromCenter <= 500) {
+        context.fillStyle = `rgba(255, 255, 255, ${Math.random() * 0.5 + 0.5})`;
+        context.fillRect(x, y, 1, 1);
+      }
+    }
+
+    // Add some larger, brighter dots
+    for (let i = 0; i < 200; i++) {
+      const x = Math.random() * 1024;
+      const y = Math.random() * 1024;
+      const distanceFromCenter = Math.sqrt(
+        Math.pow(x - 512, 2) + Math.pow(y - 512, 2)
+      );
+      if (distanceFromCenter <= 500) {
+        context.fillStyle = "rgba(255, 255, 255, 1)";
+        context.beginPath();
+        context.arc(x, y, Math.random() * 2 + 1, 0, 2 * Math.PI);
+        context.fill();
+      }
+    }
+
+    return context.getImageData(0, 0, 1024, 1024);
   }, []);
 
-  const markerSvg = useMemo(() => {
-    return `<svg viewBox="-4 0 36 36">
-      <path fill="currentColor" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
-      <circle fill="black" cx="14" cy="14" r="7"></circle>
-    </svg>`;
+  useEffect(() => {
+    if (globeRef.current) {
+      const globe = globeRef.current;
+      globe.controls().autoRotate = true;
+      globe.controls().autoRotateSpeed = 0.5;
+    }
   }, []);
+
+  const markerSvg = useCallback(
+    (color: string) => `
+    <svg viewBox="-4 0 36 36" width="14" height="14">
+      <path fill="${color}" d="M14,0 C21.732,0 28,5.641 28,12.6 C28,23.963 14,36 14,36 C14,36 0,24.064 0,12.6 C0,5.641 6.268,0 14,0 Z"></path>
+    </svg>
+  `,
+    []
+  );
 
   return (
-    <div className="w-full h-full flex items-center justify-center">
-      <Globe
-        globeImageUrl="//unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
-        bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
-        // backgroundImageUrl="//unpkg.com/three-globe/example/img/night-sky.png"
-        pointsData={data}
-        pointLat="lat"
-        pointLng="lng"
-        pointColor={(d) => getPointColor(d as DataPoint)} // Cast to DataPoint
-        pointAltitude={0.07}
-        pointRadius={0.05}
-        pointsMerge={true}
-        pointLabel={(d: any) =>
-          `${d.city}: Pop. ${d.population.toLocaleString()}`
-        }
-        htmlElementsData={data}
-        htmlElement={(d: any) => {
-          const el = document.createElement("div");
-          el.innerHTML = markerSvg;
-          el.style.color = getPointColor(d as DataPoint); // Cast to DataPoint
-          el.style.width = "20px";
-          el.style.height = "20px";
-          return el;
-        }}
-        width={400}
-        height={400}
-        backgroundColor="rgba(0,0,0,0)"
-        atmosphereColor="#3a228a"
-        atmosphereAltitude={0.25}
-        globeMaterial={globeMaterial}
-        showAtmosphere={true}
-        showGraticules={false}
-        polygonsData={[]}
-        polygonCapColor={() => "rgba(200, 0, 0, 0.3)"}
-        polygonSideColor={() => "rgba(150, 0, 0, 0.3)"}
-        polygonStrokeColor={() => "#111"}
-        ringsData={[]}
-        ringColor={() => "#9cff00"}
-        ringMaxRadius={2}
-        arcsData={[]}
-        arcColor={(e: any) => {
-          const op = Math.pow(0.9, e.stroke);
-          return `rgba(255,100,50,${op})`;
-        }}
-        arcAltitude={0.1}
-        arcStroke={0.5}
-        arcDashLength={1}
-        arcDashGap={0.5}
-        arcDashAnimateTime={4000}
-      />
+    <div className="  flex items-center justify-center">
+      <div className="">
+        <div className="absolute inset-0 rounded-full bg-white opacity-10 blur-3xl"></div>
+        <Globe
+          ref={globeRef}
+          globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+          bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
+          // customGlobeImageUrl={customGlobeImage}
+          pointsData={data}
+          pointLat="lat"
+          pointLng="lng"
+          pointColor={() => "#FF69B4"}
+          pointAltitude={0.1}
+          pointRadius={0.25}
+          pointsMerge={false}
+          htmlElementsData={data}
+          htmlElement={(d: any) => {
+            const el = document.createElement("div");
+            el.innerHTML = markerSvg("#FF69B4");
+            el.style.width = "20px";
+            el.style.height = "20px";
+            el.style.pointerEvents = "auto";
+            el.style.cursor = "pointer";
+            el.onclick = () => alert(`Clicked on ${d.city}`);
+            return el;
+          }}
+          width={400}
+          height={400}
+          backgroundColor="rgba(0,0,0,0)"
+          atmosphereColor="#ffffff"
+          atmosphereAltitude={0.25}
+          globeMaterial={globeMaterial}
+          showAtmosphere={true}
+          showGraticules={false}
+        />
+      </div>
+      <div className="absolute bottom-4 left-4 text-white text-sm space-y-2">
+        {data.map((location, index) => (
+          <div key={index} className="flex items-center">
+            <span className="w-3 h-3 bg-pink-500 rounded-full mr-2"></span>
+            {location.city}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

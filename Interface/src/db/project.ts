@@ -16,7 +16,7 @@ export interface File {
   name: string;
   size: number;
   dateUploaded: Date;
-  _id?: string; // Optional if MongoDB generates it
+  file_uuid: string; // Optional if MongoDB generates it
 }
 
 export interface Project {

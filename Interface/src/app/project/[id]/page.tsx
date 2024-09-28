@@ -10,7 +10,7 @@ import { getFilesByUserIdProjectId, uploadFileToDb } from "@/db/files";
 import { FileUploadPopup } from "@/components/shared/FileUploadPopup";
 
 interface FileItem {
-  id: string;
+  file_uuid: string;
   name: string;
   description: string;
   size: string;
@@ -31,7 +31,7 @@ async function getProjectFiles(
     console.log("Files fetched successfully:", files);
 
     return files.map((file) => ({
-      id: file._id,
+      file_uuid: file.file_uuid,
       name: file.name,
       description: file.description,
       size: file.size,
@@ -78,7 +78,7 @@ export default function Component({ params }: { params: { id: string } }) {
 
   const removeFile = async (id: string) => {
     // Implement file removal logic here
-    setFiles(files.filter((file) => file.id !== id));
+    setFiles(files.filter((file) => file.file_uuid !== id));
   };
 
   const addNewFile = (newFile: FileItem) => {
@@ -112,7 +112,7 @@ export default function Component({ params }: { params: { id: string } }) {
           <ScrollArea className="h-[calc(100vh-250px)]">
             {files.map((file) => (
               <div
-                key={file.id}
+                key={file.file_uuid}
                 className="px-6 py-4 flex items-center justify-between hover:bg-gray-700 transition-colors duration-150"
               >
                 <div className="flex items-center w-2/5">
@@ -130,7 +130,7 @@ export default function Component({ params }: { params: { id: string } }) {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => removeFile(file.id)}
+                    onClick={() => removeFile(file.file_uuid)}
                     className="text-red-400 hover:text-red-300 hover:bg-red-400/20"
                   >
                     <Trash2Icon className="h-5 w-5" />

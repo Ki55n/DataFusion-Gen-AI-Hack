@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "../ui/button";
 
 interface FileItem {
-  id: string;
+  file_uuid: string;
   name: string;
   description: string;
   size: string;
@@ -28,25 +28,30 @@ async function uploadFile(
     formData.append("description", description);
     formData.append("projectId", projectId);
 
-    const response = await fetch("http://localhost:8000/upload-file", {
-      method: "POST",
-      body: formData,
-    });
+    const response = await fetch(
+      `${process.env.NEXT_PUBLIC_SQLITE_URL}/upload-file`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
     if (!response.ok) {
       throw new Error("File upload failed");
     }
     const file_uuid = await response.json();
+    console.log(file_uuid);
+
     const filedata = {
       name: name,
       size: file.size,
       dateUploaded: new Date(),
-      _id: file_uuid.toString() as string,
+      file_uuid: file_uuid.file_uuid,
     };
 
     await uploadFileToDb(userId, projectId, description, filedata);
 
     return {
-      id: filedata._id,
+      file_uuid: filedata.file_uuid,
       name: name,
       size: filedata.size.toString(),
       uploadDate: filedata.dateUploaded,

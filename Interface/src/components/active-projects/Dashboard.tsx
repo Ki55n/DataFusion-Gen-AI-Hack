@@ -5,6 +5,9 @@ import Header from "./Header";
 import ProjectCard from "./ProjectCard";
 import LoadProjectsDialog from "./LoadProjectsDialog";
 import AsidePanel from "./AsidePanel";
+import { dataCleaningPipeline } from "@/action/cleaning/cleaning";
+import { dataAnalysisPipeline } from "@/action/analyse/analyse";
+import { changeProjectStatus } from "@/db/project";
 
 type Project = {
   _id: string;
@@ -37,21 +40,53 @@ export default function Dashboard({ initialProjects }: DashboardProps) {
     setIsAsidePanelOpen(true);
   };
 
-  const handleLoadProjects = (newProjects: Project[]) => {
-    setProjects((prevProjects) => {
-      const updatedProjects = [...prevProjects];
-      newProjects.forEach((newProject) => {
-        const index = updatedProjects.findIndex(
-          (p) => p._id === newProject._id
-        );
-        if (index !== -1) {
-          updatedProjects[index] = newProject;
-        } else {
-          updatedProjects.push(newProject);
+  const handleLoadProjects = async (newProjects: Project[]) => {
+    try {
+      console.log("Loading new projects...");
+      console.log(newProjects[0].files);
+
+      for (const newProject of newProjects) {
+        console.log(`Processing project: ${newProject._id}`);
+
+        // Change project status to active
+        await changeProjectStatus(newProject._id, "active");
+
+        // Process files within each project
+        console.log();
+        for (const file of newProject.files) {
+          console.log(`Running data cleaning pipeline on file: ${file}`);
+          await dataCleaningPipeline(file);
+
+          console.log(`Running data analysis pipeline on file: ${file}`);
+          await dataAnalysisPipeline(file);
         }
+      }
+
+      // Update state with new projects
+      setProjects((prevProjects) => {
+        console.log("Updating projects state...");
+        const updatedProjects = [...prevProjects];
+
+        newProjects.forEach((newProject) => {
+          const existingProjectIndex = updatedProjects.findIndex(
+            (project) => project._id === newProject._id
+          );
+
+          if (existingProjectIndex !== -1) {
+            console.log(`Updating existing project: ${newProject._id}`);
+            updatedProjects[existingProjectIndex] = newProject;
+          } else {
+            console.log(`Adding new project: ${newProject._id}`);
+            updatedProjects.push(newProject);
+          }
+        });
+
+        console.log("Projects state updated.");
+        return updatedProjects;
       });
-      return updatedProjects;
-    });
+    } catch (error) {
+      console.error("Error in handleLoadProjects: ", error);
+    }
   };
 
   return (
@@ -65,14 +100,16 @@ export default function Dashboard({ initialProjects }: DashboardProps) {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project._id}
-              project={project}
-              onDelete={handleDeleteProject}
-              onOpenAsidePanel={openAsidePanel}
-            />
-          ))}
+          {projects
+            .filter((project) => project.status === "active")
+            .map((project) => (
+              <ProjectCard
+                key={project._id}
+                project={project}
+                onDelete={handleDeleteProject}
+                onOpenAsidePanel={openAsidePanel}
+              />
+            ))}
         </div>
       )}
 

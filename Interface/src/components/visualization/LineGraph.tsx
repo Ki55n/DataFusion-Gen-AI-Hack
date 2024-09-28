@@ -33,11 +33,8 @@ const LineGraph: React.FC<LineGraphProps> = ({ data }) => {
     y.domain([0, d3.max(data, (d) => d.value) || 0]);
 
     // Background
-    svg
-      .append("rect")
-      .attr("width", width)
-      .attr("height", height)
-      .attr("fill", "#1a1a2e");
+    // svg.append("rect").attr("width", width).attr("height", height);
+    // .attr("fill", "#1a1a2e");
 
     // Grid lines
     svg
@@ -203,7 +200,7 @@ const LineGraph: React.FC<LineGraphProps> = ({ data }) => {
   }, [data]);
 
   return (
-    <div className="bg-[#1a1a2e] p-4 rounded-lg shadow-lg">
+    <div className=" h-full flex justify-center items-center p-4 rounded-lg shadow-lg">
       <svg ref={svgRef} width="100%" height="300" />
     </div>
   );

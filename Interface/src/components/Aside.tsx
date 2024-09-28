@@ -26,7 +26,7 @@ export default function Aside() {
     { route: "/dashboard/visualizer", icon: <CiUser />, name: "Visualizer" },
     { route: "/dashboard/cleaner", icon: <CiCreditCard1 />, name: "Cleaner" },
     {
-      route: "/dashboard/chat-with-data",
+      route: "/chat-with-data",
       icon: <CiCalendarDate />,
       name: "Chat with data",
     },

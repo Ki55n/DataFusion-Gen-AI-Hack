@@ -1,177 +1,142 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 
 interface BarChartProps {
   data: { label: string; value: number }[];
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data }) => {
+export default function Component({ data }: BarChartProps) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
   useEffect(() => {
-    if (!svgRef.current) return;
+    const handleResize = () => {
+      if (containerRef.current) {
+        const { width, height } = containerRef.current.getBoundingClientRect();
+        setDimensions({ width, height });
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Initial setup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (!svgRef.current || dimensions.width === 0 || dimensions.height === 0)
+      return;
 
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
-    const width = 450;
-    const height = 320;
-    const margin = { top: 40, right: 30, bottom: 70, left: 60 };
+    const { width, height } = dimensions;
+    const margin = { top: 40, right: 30, bottom: 50, left: 60 };
+    const chartWidth = width - margin.left - margin.right;
+    const chartHeight = height - margin.top - margin.bottom;
 
-    const x = d3
-      .scaleBand()
-      .range([margin.left, width - margin.right])
-      .padding(0.3);
-
-    const y = d3.scaleLinear().range([height - margin.bottom, margin.top]);
+    const x = d3.scaleBand().range([0, chartWidth]).padding(0.3);
+    const y = d3.scaleLinear().range([chartHeight, 0]);
 
     x.domain(data.map((d) => d.label));
     y.domain([0, d3.max(data, (d) => d.value) || 0]);
 
-    // Create subtle grid lines
-    const yGrid = d3
-      .axisLeft(y)
-      .tickSize(-width + margin.left + margin.right)
-      .tickFormat(() => "");
-
-    svg
+    const chart = svg
       .append("g")
-      .attr("transform", `translate(${margin.left},0)`)
-      .call(yGrid)
-      .selectAll(".tick line")
-      .attr("stroke", "rgba(255, 255, 255, 0.1)")
-      .style("opacity", 0.5);
+      .attr("transform", `translate(${margin.left},${margin.top})`);
 
-    // Create colorful gradient for the bars
-    const barGradient = svg
-      .append("defs")
-      .append("linearGradient")
-      .attr("id", "barGradient")
-      .attr("x1", "0%")
-      .attr("x2", "0%")
-      .attr("y1", "0%")
-      .attr("y2", "100%");
+    // Create tooltip
+    const tooltip = d3
+      .select(containerRef.current)
+      .append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0)
+      .style("position", "absolute")
+      .style("background-color", "rgba(0, 0, 0, 0.8)")
+      .style("color", "#fff")
+      .style("padding", "8px")
+      .style("border-radius", "4px")
+      .style("font-size", "12px")
+      .style("pointer-events", "none")
+      .style("transition", "opacity 0.2s ease")
+      .style("z-index", "10");
 
-    barGradient
-      .append("stop")
-      .attr("offset", "0%")
-      .attr("stop-color", "rgba(194, 57, 219, 0.8)");
-
-    barGradient
-      .append("stop")
-      .attr("offset", "50%")
-      .attr("stop-color", "rgba(129, 34, 143, 0.8)");
-
-    barGradient
-      .append("stop")
-      .attr("offset", "100%")
-      .attr("stop-color", "rgba(74, 14, 78, 0.8)");
-
-    // Create bars with colorful gradient and animation
-    svg
-      .selectAll("rect.bar")
+    // Create bars
+    chart
+      .selectAll(".bar")
       .data(data)
       .enter()
       .append("rect")
       .attr("class", "bar")
       .attr("x", (d) => x(d.label) || 0)
-      .attr("y", height - margin.bottom)
+      .attr("y", (d) => y(d.value))
       .attr("width", x.bandwidth())
-      .attr("height", 0)
-      .attr("fill", "url(#barGradient)")
+      .attr("height", (d) => chartHeight - y(d.value))
+      .attr("fill", "#60A5FA")
       .attr("rx", 4)
       .attr("ry", 4)
-      .transition()
-      .duration(800)
-      .delay((_, i) => i * 100)
-      .attr("y", (d) => y(d.value))
-      .attr("height", (d) => height - margin.bottom - y(d.value));
+      .on("mousemove", function (event, d) {
+        const [mouseX, mouseY] = d3.pointer(event, containerRef.current);
+        d3.select(this).attr("fill", "#3B82F6").attr("cursor", "pointer");
+        tooltip
+          .style("opacity", 1)
+          .html(`${d.label}: ${d.value}`)
+          .style("left", `${mouseX}px`)
+          .style("top", `${mouseY - 40}px`);
+      })
+      .on("mouseout", function () {
+        d3.select(this).attr("fill", "#60A5FA").attr("cursor", "default");
+        tooltip.style("opacity", 0);
+      });
 
     // Add X Axis
-    svg
+    chart
       .append("g")
-      .attr("transform", `translate(0,${height - margin.bottom})`)
-      .call(d3.axisBottom(x).tickSize(0).tickPadding(10))
+      .attr("transform", `translate(0,${chartHeight})`)
+      .call(d3.axisBottom(x).tickSize(0))
       .selectAll("text")
-      .attr("transform", "rotate(-45)")
-      .style("text-anchor", "end")
+      .style("text-anchor", "middle")
       .style("fill", "rgba(255, 255, 255, 0.8)")
       .style("font-size", "12px");
 
     // Add Y Axis
-    svg
+    chart
       .append("g")
-      .attr("transform", `translate(${margin.left},0)`)
-      .call(d3.axisLeft(y).ticks(5).tickSize(0).tickPadding(10))
+      .call(d3.axisLeft(y).ticks(5).tickSize(-chartWidth))
       .selectAll("text")
       .style("fill", "rgba(255, 255, 255, 0.8)")
       .style("font-size", "12px");
 
-    // Remove axis lines
-    svg.selectAll(".domain").remove();
+    // Style axis lines
+    chart.selectAll(".domain").remove();
+    chart.selectAll(".tick line").attr("stroke", "rgba(255, 255, 255, 0.1)");
 
-    // Add bar labels with animation
-    svg
-      .selectAll("text.bar-label")
-      .data(data)
-      .enter()
-      .append("text")
-      .attr("class", "bar-label")
-      .attr("x", (d) => (x(d.label) || 0) + x.bandwidth() / 2)
-      .attr("y", height - margin.bottom)
-      .attr("text-anchor", "middle")
-      .text((d) => d.value)
-      .style("fill", "rgba(255, 255, 255, 0.9)")
-      .style("font-size", "12px")
-      .style("font-weight", "bold")
-      .transition()
-      .duration(800)
-      .delay((_, i) => i * 100)
-      .attr("y", (d) => y(d.value) - 5);
-
-    // Add chart title
+    // Add title
     svg
       .append("text")
       .attr("class", "chart-title")
       .attr("text-anchor", "middle")
       .attr("x", width / 2)
       .attr("y", margin.top / 2)
-      .text("Bar Chart")
       .style("fill", "rgba(255, 255, 255, 0.9)")
       .style("font-size", "18px")
-      .style("font-weight", "bold");
+      .style("font-weight", "bold")
+      .text("Interactive Bar Chart");
 
-    // Add X-axis title
-    svg
-      .append("text")
-      .attr("class", "x-axis-title")
-      .attr("text-anchor", "middle")
-      .attr("x", width / 2)
-      .attr("y", height - 10)
-      .text("Categories")
-      .style("fill", "rgba(255, 255, 255, 0.7)")
-      .style("font-size", "14px");
-
-    // Add Y-axis title
-    svg
-      .append("text")
-      .attr("class", "y-axis-title")
-      .attr("text-anchor", "middle")
-      .attr("x", -height / 2)
-      .attr("y", 20)
-      .attr("transform", "rotate(-90)")
-      .text("Values")
-      .style("fill", "rgba(255, 255, 255, 0.7)")
-      .style("font-size", "14px");
-  }, [data]);
+    // Add aria-label for accessibility
+    svg.attr("aria-label", "Interactive bar chart showing data distribution");
+  }, [data, dimensions]);
 
   return (
-    <div className="w-full h-[320px] rounded-lg overflow-hidden">
-      <svg ref={svgRef} width="100%" height="100%" />
+    <div ref={containerRef} className="w-full h-full relative">
+      <svg
+        ref={svgRef}
+        width={dimensions.width}
+        height={dimensions.height}
+        className="w-full h-full"
+      />
     </div>
   );
-};
-
-export default BarChart;
+}

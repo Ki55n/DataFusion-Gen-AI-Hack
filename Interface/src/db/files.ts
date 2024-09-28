@@ -16,7 +16,17 @@ export interface File {
   name: string;
   size: number;
   dateUploaded: Date;
-  _id: string; // Optional if MongoDB generates it
+  file_uuid: string; // Optional if MongoDB generates it
+}
+
+export interface Project {
+  name: string;
+  description: string;
+  createdAt: Date;
+  status: string;
+  files: File[];
+  _id?: ObjectId; // MongoDB will generate this
+  userId: string; // Assuming userId is a string, modify as needed
 }
 
 export async function getFilesByUserIdProjectId(
@@ -30,7 +40,7 @@ export async function getFilesByUserIdProjectId(
     const query = { userId, projectId };
     const userFiles = await files.find(query).toArray();
     const formattedFiles = userFiles.map((file) => ({
-      _id: file._id.toString(),
+      file_uuid: file.file_uuid,
       name: file.name,
       description: file.description,
       size: file.size,
@@ -52,11 +62,16 @@ export async function uploadFileToDb(
   description: string,
   file: File
 ) {
+  console.log(file);
   try {
     await client.connect();
     const database = client.db("datafusion");
     const files = database.collection("files");
+    const projects = database.collection("projects");
+
+    // Create the new file object
     const newFile = {
+      file_uuid: file.file_uuid,
       userId,
       projectId,
       name: file.name,
@@ -64,13 +79,33 @@ export async function uploadFileToDb(
       dateUploaded: new Date(),
       description: description,
     };
+
+    // Insert the new file into the files collection
     const result = await files.insertOne(newFile);
     if (result.acknowledged) {
       console.log(
         `New file inserted with the following id: ${result.insertedId}`
       );
+
+      const project = await projects.findOne({
+        userId: userId,
+        _id: new ObjectId(projectId),
+      });
+
+      console.log(userId);
+      console.log(projectId);
+      console.log(project);
+      if (project) {
+        project.files.push(newFile.file_uuid);
+        await projects.updateOne(
+          { userId: userId },
+          { $set: { files: project.files } }
+        );
+        console.log("File added to project");
+      }
+
+      return result.insertedId.toString();
     }
-    return result.insertedId.toString();
   } catch (err) {
     console.error("Error uploading file:", err);
     return null;

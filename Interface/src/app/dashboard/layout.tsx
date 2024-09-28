@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Aside from "@/components/Aside";
 import React from "react";
 import Providers from "@/app/providers";
+import { AuthContextProvider } from "../context/AuthContext";
 
 export const metadata: Metadata = {
   title: "Data fusion",
@@ -33,7 +34,9 @@ export default function RootLayout({
               {/* <Header user={user} /> */}
 
               {/* Children content area */}
-              <div className="flex-grow">{children}</div>
+              <AuthContextProvider>
+                <div className="flex-grow">{children}</div>
+              </AuthContextProvider>
             </div>
 
             {/* Chatbot fixed button */}

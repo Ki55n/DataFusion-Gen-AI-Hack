@@ -41,7 +41,6 @@ export default function LoadProjectsDialog({
   const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
 
   const handleProjectSelection = (projectId: string) => {
-    changeProjectStatus(projectId, "active");
     setSelectedProjects((prev) =>
       prev.includes(projectId)
         ? prev.filter((id) => id !== projectId)
@@ -74,28 +73,35 @@ export default function LoadProjectsDialog({
           </DialogDescription>
         </DialogHeader>
         <ScrollArea className="mt-4 h-[300px] pr-4">
-          {projects.map((project) => (
-            <div key={project._id} className="flex items-center space-x-2 mb-4">
-              <Checkbox
-                id={project._id}
-                checked={selectedProjects.includes(project._id)}
-                onCheckedChange={() => handleProjectSelection(project._id)}
-              />
-              <label
-                htmlFor={project._id}
-                className="text-sm font-medium flex items-center space-x-2"
+          {projects
+            .filter((project) => project.status === "inactive")
+            .map((project) => (
+              <div
+                key={project._id}
+                className="flex items-center space-x-2 mb-4"
               >
-                <span>{project.name}</span>
-                <span
-                  className={`text-xs px-2 py-1 rounded ${
-                    project.status === "active" ? "bg-green-500" : "bg-gray-500"
-                  }`}
+                <Checkbox
+                  id={project._id}
+                  checked={selectedProjects.includes(project._id)}
+                  onCheckedChange={() => handleProjectSelection(project._id)}
+                />
+                <label
+                  htmlFor={project._id}
+                  className="text-sm font-medium flex items-center space-x-2"
                 >
-                  {project.status}
-                </span>
-              </label>
-            </div>
-          ))}
+                  <span>{project.name}</span>
+                  <span
+                    className={`text-xs px-2 py-1 rounded ${
+                      project.status === "active"
+                        ? "bg-green-500"
+                        : "bg-gray-500"
+                    }`}
+                  >
+                    {project.status}
+                  </span>
+                </label>
+              </div>
+            ))}
         </ScrollArea>
         <div className="mt-4 flex justify-end">
           <Button
