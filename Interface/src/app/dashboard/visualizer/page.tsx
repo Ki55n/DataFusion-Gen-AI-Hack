@@ -57,13 +57,13 @@ export default function Dashboard() {
   const [isResizable, setIsResizable] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const router = useRouter();
-  const { user }: any = UserAuth();
+  const { user, loading: authLoading }: any = UserAuth(); // Use 'loading' from auth context
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/login"); // Redirect to the login page if not authenticated
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   const userId = user?.uid;
 

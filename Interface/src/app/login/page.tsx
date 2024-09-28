@@ -17,9 +17,15 @@ export default function Login() {
   const [sendPasswordResetEmail, sendingReset, resetError] =
     useSendPasswordResetEmail(auth);
   const router = useRouter();
-  const { googleSignIn } = UserAuth();
   const [loginError, setLoginError] = useState("");
   const [loadingVerification, setLoadingVerification] = useState(false);
+  const { user, loading: authLoading, googleSignIn }: any = UserAuth(); // Use 'loading' from auth context
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/dashboard/projects"); // Redirect to the login page if not authenticated
+    }
+  }, [user, authLoading, router]);
 
   const handleSignIn = async () => {
     try {

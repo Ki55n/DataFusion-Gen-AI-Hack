@@ -32,14 +32,14 @@ export default function Home() {
   const chatContainerRef = useRef<HTMLDivElement>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
-  const { user }: any = UserAuth();
+  const { user, loading: authLoading }: any = UserAuth(); // Use 'loading' from auth context
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/login"); // Redirect to the login page if not authenticated
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   const handleDisplayResult = async (newQuestion?: string) => {
     newQuestion = newQuestion || promptValue;

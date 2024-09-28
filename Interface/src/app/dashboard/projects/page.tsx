@@ -53,7 +53,7 @@ interface Project {
 }
 
 export default function Component() {
-  const { user }: any = UserAuth();
+  const { user, loading: authLoading }: any = UserAuth(); // Use 'loading' from auth context
   const [projects, setProjects] = useState<Project[]>([]);
 
   const [isOpen, setIsOpen] = useState(false);
@@ -63,10 +63,12 @@ export default function Component() {
   console.log(user);
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
+      console.log(user);
+      console.log("yoyoyo");
       router.push("/login"); // Redirect to the login page if not authenticated
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     const fetchProjects = async () => {

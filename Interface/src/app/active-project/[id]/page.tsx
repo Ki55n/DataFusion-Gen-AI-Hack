@@ -22,14 +22,14 @@ interface ComponentProps {
 export default function Component({ params }: ComponentProps) {
   const [files, setFiles] = useState<FileItem[]>([]);
   const [selectedFileIds, setSelectedFileIds] = useState<string[]>([]);
-  const { user }: any = UserAuth();
+  const { user, loading: authLoading }: any = UserAuth(); // Use 'loading' from auth context
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/login"); // Redirect to the login page if not authenticated
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     const fetchFiles = async () => {

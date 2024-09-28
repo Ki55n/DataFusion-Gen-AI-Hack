@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useCreateUserWithEmailAndPassword,
   useSendEmailVerification,
@@ -18,10 +18,16 @@ export default function Signup() {
   const [sendEmailVerification, sending, verificationError] =
     useSendEmailVerification(auth);
   const router = useRouter();
-  const { googleSignIn } = UserAuth();
+  const { googleSignIn, user, loading: authLoading } = UserAuth();
   const [popupVisible, setPopupVisible] = useState(false);
   const [alertmsg, setAlertmsg] = useState("");
   const [passwordError, setPasswordError] = useState(""); // Password error state
+
+  useEffect(() => {
+    if (!authLoading && user) {
+      router.push("/dashboard/projects"); // Redirect to the login page if not authenticated
+    }
+  }, [user, authLoading, router]);
 
   // Password validation logic
   const validatePassword = (password: string) => {

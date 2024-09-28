@@ -19,17 +19,17 @@ type Project = {
 };
 
 export default function DashboardPage() {
-  const { user }: any = UserAuth();
+  const { user, loading: authLoading }: any = UserAuth(); // Use 'loading' from auth context
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
+    if (!authLoading && !user) {
       router.push("/login"); // Redirect to the login page if not authenticated
     }
-  }, [user, router]);
+  }, [user, authLoading, router]);
 
   useEffect(() => {
     async function fetchProjects() {

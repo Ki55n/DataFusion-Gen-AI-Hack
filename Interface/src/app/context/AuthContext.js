@@ -8,15 +8,17 @@ import {
 } from "firebase/auth";
 import { auth } from "../firebase/config";
 
-// Create AuthContext with default values as null or empty functions
+// Create AuthContext with default values
 const AuthContext = createContext({
   user: null,
   googleSignIn: () => {},
   logOut: () => {},
+  loading: true, // Add loading state in the default context
 });
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Add loading state
 
   const googleSignIn = () => {
     console.log("google sign in");
@@ -35,14 +37,15 @@ export const AuthContextProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
+      setLoading(false); // Set loading to false once the user state is determined
     });
 
     // Cleanup subscription on unmount
     return () => unsubscribe();
-  }, []); // Dependency array is empty to run this effect only once
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ user, googleSignIn, logOut }}>
+    <AuthContext.Provider value={{ user, googleSignIn, logOut, loading }}>
       {children}
     </AuthContext.Provider>
   );
