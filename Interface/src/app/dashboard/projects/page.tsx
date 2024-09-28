@@ -92,7 +92,7 @@ export default function Component() {
         name: newProject.name,
         description: newProject.description,
         createdAt: new Date(),
-        status: "active",
+        status: "inactive",
         files: [],
         userId: user.uid, // Assuming a default user ID, modify as needed
       };
