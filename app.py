@@ -106,7 +106,7 @@ from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, S
 
 # Initialize Flask app and extensions
 app = Flask(__name__, static_folder='static')
-app.secret_key = 'd823243f4b3906be44452a1c8f82ee0a'
+app.secret_key = 'YOUR KEY'
 socketio = SocketIO(app, json=json, cors_allowed_origins="*")
 jwt = JWTManager(app)
 
