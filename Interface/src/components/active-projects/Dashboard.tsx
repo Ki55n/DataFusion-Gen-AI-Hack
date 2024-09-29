@@ -48,9 +48,6 @@ export default function Dashboard({ initialProjects }: DashboardProps) {
       for (const newProject of newProjects) {
         console.log(`Processing project: ${newProject._id}`);
 
-        // Change project status to active
-        await changeProjectStatus(newProject._id, "active");
-
         // Process files within each project
         console.log();
         for (const file of newProject.files) {
@@ -60,6 +57,8 @@ export default function Dashboard({ initialProjects }: DashboardProps) {
           console.log(`Running data analysis pipeline on file: ${file}`);
           await dataAnalysisPipeline(file);
         }
+        // Change project status to active
+        await changeProjectStatus(newProject._id, "active");
       }
 
       // Update state with new projects

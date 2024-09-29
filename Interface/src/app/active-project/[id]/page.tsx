@@ -33,7 +33,7 @@ export default function Component({ params }: ComponentProps) {
 
   useEffect(() => {
     const fetchFiles = async () => {
-      const userId = "Gj5EYn2EI5WleriVTBVbkA3F81S2"; // Replace with actual user ID
+      const userId = user.uid; // Replace with actual user ID
       const projectId = params?.id || "";
       const fetchedFiles = await getFilesByUserIdProjectId(userId, projectId);
       setFiles(fetchedFiles);
