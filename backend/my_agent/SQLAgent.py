@@ -1,8 +1,8 @@
 import uuid
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import JsonOutputParser
-from backend_dateja.my_agent.DatabaseManager import DatabaseManager
-from backend_dateja.my_agent.LLMManager import LLMManager
+from backend.my_agent.DatabaseManager import DatabaseManager
+from backend.my_agent.LLMManager import LLMManager
 
 class SQLAgent:
     def __init__(self, API_KEY, ENDPOINT_URL):

@@ -6,9 +6,9 @@ from langchain.agents import Tool, initialize_agent
 from langchain_core.prompts import ChatPromptTemplate
 
 # from backend_dateja.my_agent.main import graph
-from backend_dateja.my_agent.WorkflowManager import WorkflowManager
-from backend_dateja.my_agent.LLMManager import LLMManager
-from backend_dateja.receptionist.assistant import VirtualAssistant
+from backend.my_agent.WorkflowManager import WorkflowManager
+from backend.my_agent.LLMManager import LLMManager
+from backend.receptionist.assistant import VirtualAssistant
 
 class CombinedAgent:
     def __init__(self, api_key, endpoint_url):

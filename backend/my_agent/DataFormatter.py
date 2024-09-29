@@ -1,7 +1,7 @@
 import json
 from langchain_core.prompts import ChatPromptTemplate
-from backend_dateja.my_agent.LLMManager import LLMManager
-from backend_dateja.my_agent.graph_instructions import graph_instructions
+from backend.my_agent.LLMManager import LLMManager
+from backend.my_agent.graph_instructions import graph_instructions
 
 
 class DataFormatter:
@@ -38,15 +38,49 @@ class DataFormatter:
                 return self._format_line_data(results, question)
             except Exception as e:
                 return self._format_other_visualizations(visualization, question, sql_query, results)
-            
-        if visualization == "globe":
-            try:
-                return self._format_globe_data(results, question)
-            except Exception as e:
-                return self._format_other_visualizations(visualization, question, sql_query, results)
         
         return self._format_other_visualizations(visualization, question, sql_query, results)
-    
+
+
+    def summarize_visualization(self, state: dict) -> dict:
+        """Summarize the produced visualization of the data."""
+        results = state['results']
+        question = state['question']
+        vis_type = state['visualization']
+
+        if vis_type == "none":
+            return {"visualization_summary": "none"}
+        
+        vis_type = state['visualization']
+        vis_data = state['formatted_data_for_visualization']
+
+        system_template = """You are an expert data analyst and visualization interpreter. Your task is to summarize a data visualization based on the raw visualization data, visualizaiton type, and the description of the visualization. 
+        Provide a clear, concise summary that captures the key insights and trends. Your summary should be suitable for being read aloud to a user.
+
+        Follow these guidelines:
+        1. Analyze the data to ensure a comprehensive understanding.
+        2. Focus on the most important trends, patterns, or insights from the data.
+        3. Mention any discrepancies between the visualization and the raw data, if any.
+        4. Keep the language clear and accessible, avoiding overly technical terms.
+        5. Limit the summary to about 3-5 sentences for easy listening.
+        6. End with a key takeaway or main point of the visualization.
+
+        Remember, the user will hear this summary, so make it easy to follow and understand when spoken aloud."""
+
+        human_template = f"""Visualization Type: {vis_type}
+        Visualization Data (JSON format):
+        {{vis_data}}
+
+        Please summarize this visualization, focusing on the key insights and trends, in a way that can be easily understood when read aloud."""
+
+        prompt = ChatPromptTemplate.from_messages([
+            ("system", system_template),
+            ("human", human_template),
+        ])
+
+        response = self.llm_manager.invoke(prompt, vis_type=vis_type, vis_data=vis_data)
+        return {"visualization_summary": response}
+
     def _format_line_data(self, results, question):
         if isinstance(results, str):
             results = eval(results)

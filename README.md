@@ -22,7 +22,6 @@
 
 ## 🛠️ Features
 
-
 1. **Easy grouping** of similar data sources (Projects and Active Projects)
 2. **Language Query** for intuitive multi-table data exploration
 3. **Generative interactive charts** for dynamic data visualization
@@ -45,7 +44,29 @@ To get started:
 
 
 ## 💡 Example Queries
+The model's responses depend heavily on the input queries. Whether you receive a simple one-liner answer, a detailed explanation, or a visualization depends on the query and the specific keywords used. Below, we'll explore how queries and their responses can vary.
 
+Consider you have a dataset of passengers who survived the Titanic accident. You may want to ask the following queries:
+
+1. What is the distribution of passenger classes (first, second, third) on the Titanic?
+   - Provides a text answer and plots a `pie chart` showing the number of people in each passenger class.
+
+2. How many males survived the Titanic accident?
+   - Returns a text answer as visualization is not applicable.
+
+3. How does the survival rate vary across different age groups?
+   - Plots a line graph and explains how the survival rate changes for different age groups.
+
+4. Plot a bar chart to understand the age distribution of males vs females.
+   - Explicitly plots a bar chart showing the age distribution, distinguishing between males and females.
+
+## 📂 File Structure
+
+- `main.py` - Main file where the AI server app is defined.
+- `backend/`
+  - `my_agent/` - Backbone of the AI server.
+  - `sqlite-server/` - Backbone of the SQLite server.
+- `frontend/`
 
 ## 📖 About us
 We are a dedicated team of developers passionate about simplifying data analysis and visualization. 
@@ -56,7 +77,4 @@ Team members:
 - Kiran Chawan
 - Mamoon Jan
 
-
-## 🤝 Citations
-We would like to acknowledge the work of Dhruv Ateja for his project on Data Visualization. His strategy inspired us in developing the text-to-query methodology for this project.
 
