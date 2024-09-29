@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import dynamic from "next/dynamic";
 import { Button } from "@/components/ui/button";
 import {
   getVisualizations,
@@ -11,17 +10,17 @@ import {
 import { Volume2, Square } from "lucide-react";
 import { UserAuth } from "@/app/context/AuthContext";
 import { useRouter } from "next/navigation";
+import { Responsive, WidthProvider } from "react-grid-layout";
+import dynamic from "next/dynamic";
 
-// Dynamically import components that rely on browser APIs
-const ResponsiveGridLayout = dynamic(
-  () =>
-    import("react-grid-layout").then((mod) => {
-      const { Responsive, WidthProvider } = mod;
-      return WidthProvider(Responsive);
-    }),
-  { ssr: false }
-);
+// Dynamically import CSS for react-grid-layout
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
 
+// Create a responsive grid layout component
+const ResponsiveGridLayout = WidthProvider(Responsive);
+
+// Dynamically import visualization components
 const LineGraph = dynamic(
   () => import("@/components/visualization/LineGraph"),
   { ssr: false }
@@ -56,12 +55,17 @@ export default function Dashboard() {
   const [isDraggable, setIsDraggable] = useState(false);
   const [isResizable, setIsResizable] = useState(false);
   const [speakingId, setSpeakingId] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
-  const { user, loading: authLoading }: any = UserAuth(); // Use 'loading' from auth context
+  const { user, loading: authLoading }: any = UserAuth();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !user) {
-      router.push("/login"); // Redirect to the login page if not authenticated
+      router.push("/login");
     }
   }, [user, authLoading, router]);
 
@@ -171,7 +175,7 @@ export default function Dashboard() {
           <Button onClick={handleEditLayout}>Edit Layout</Button>
         )}
       </div>
-      {typeof window !== "undefined" && (
+      {isClient && (
         <ResponsiveGridLayout
           className="layout"
           layouts={layouts}
