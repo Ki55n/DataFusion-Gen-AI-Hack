@@ -34,9 +34,6 @@ export default function RootLayout({
             </div>
 
             {/* Chatbot fixed button */}
-            <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-700">
-              Chatbot
-            </div>
           </main>
         </Providers>
       </body>
