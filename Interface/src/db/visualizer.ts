@@ -26,6 +26,7 @@ export interface Visualization {
     w: number;
     h: number;
   };
+  summary: string;
 }
 
 export async function getVisualizations(
@@ -47,6 +48,7 @@ export async function getVisualizations(
       data: doc.data,
       description: doc.description,
       layout: doc.layout,
+      summary: doc.summary,
     }));
   } catch (err) {
     console.error("Error fetching visualizations:", err);

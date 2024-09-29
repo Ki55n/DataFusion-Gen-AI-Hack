@@ -15,6 +15,7 @@ interface ChatMessage {
   content: string;
   visualization?: string;
   formatted_data_for_visualization?: any;
+  summary?: any;
 }
 
 interface ChatPanelProps {
@@ -76,6 +77,7 @@ export function ChatPanel({
           visualization: data.visualization,
           formatted_data_for_visualization:
             data.formatted_data_for_visualization,
+          summary: data.visualization_summary,
         };
         setChatMessages((prev) => [...prev, aiResponse]);
       } catch (error) {
@@ -92,7 +94,7 @@ export function ChatPanel({
     }
   };
 
-  const handleSaveVisualization = async (message: ChatMessage) => {
+  const handleSaveBarVisualization = async (message: ChatMessage) => {
     if (
       message.visualization &&
       message.formatted_data_for_visualization &&
@@ -105,7 +107,13 @@ export function ChatPanel({
           files.find((file) => file.id === selectedFileIds[0])?.name ||
           "Unknown",
         visualizationType: message.visualization,
-        data: message.formatted_data_for_visualization,
+        data: message.formatted_data_for_visualization.labels.map(
+          (label: any, index: any) => ({
+            label: label,
+            value:
+              message.formatted_data_for_visualization.values[0].data[index],
+          })
+        ),
         description: message.content,
         layout: {
           i: `viz-${Date.now()}`,
@@ -114,9 +122,12 @@ export function ChatPanel({
           w: 6,
           h: 4,
         },
+        summary: message.summary,
       };
 
       const result = await saveVisualization(visualizationData);
+      console.log(result);
+      console.log("yoyo");
       if (result) {
         console.log("Visualization saved successfully");
         // You can add a notification or update UI here to indicate successful save
@@ -155,7 +166,7 @@ export function ChatPanel({
             >
               {message.content}
             </div>
-            {message.visualization === "horizontal_bar" && (
+            {message.visualization == "horizontal_bar" && (
               <div className="mt-2">
                 <BarChart
                   data={message.formatted_data_for_visualization.labels.map(
@@ -169,7 +180,7 @@ export function ChatPanel({
                   )}
                 />
                 <Button
-                  onClick={() => handleSaveVisualization(message)}
+                  onClick={() => handleSaveBarVisualization(message)}
                   className="mt-2 bg-green-600 hover:bg-green-700"
                 >
                   <Save className="ml-2 h-4 w-4" />

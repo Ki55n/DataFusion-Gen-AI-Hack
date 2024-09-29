@@ -73,9 +73,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     const fetchVisualizations = async () => {
+      console.log("yoyo");
       if (userId) {
         const fetchedVisualizations = await getVisualizations(userId);
         setVisualizations(fetchedVisualizations);
+        console.log(fetchedVisualizations);
 
         const newLayouts: Layout[] = fetchedVisualizations.map((viz) => ({
           i: viz._id,
@@ -93,7 +95,7 @@ export default function Dashboard() {
 
   const renderVisualization = (visualization: Visualization) => {
     switch (visualization.visualizationType) {
-      case "bar":
+      case "horizontal_bar":
         return <BarChart data={visualization.data} />;
       case "pie":
         return <PieChart data={visualization.data} />;
@@ -198,7 +200,7 @@ export default function Dashboard() {
                 size="icon"
                 className="absolute top-2 right-2 z-10 bg-gray-900"
                 onClick={() =>
-                  speakChartData(visualization._id, visualization.description)
+                  speakChartData(visualization._id, visualization.summary)
                 }
               >
                 {speakingId === visualization._id ? (

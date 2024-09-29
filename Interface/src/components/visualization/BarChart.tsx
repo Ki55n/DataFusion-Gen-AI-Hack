@@ -7,15 +7,20 @@ interface BarChartProps {
   data: { label: string; value: number }[];
 }
 
-export default function Component({ data }: BarChartProps) {
+export default function BarChart({ data }: BarChartProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const svgRef = useRef<SVGSVGElement | null>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  console.log("Bar Chart Render");
+  console.log("Data:", data);
+  console.log("Dimensions:", dimensions);
 
   useEffect(() => {
     const handleResize = () => {
       if (containerRef.current) {
         const { width, height } = containerRef.current.getBoundingClientRect();
+        console.log("Container size:", { width, height });
         setDimensions({ width, height });
       }
     };
@@ -26,9 +31,12 @@ export default function Component({ data }: BarChartProps) {
   }, []);
 
   useEffect(() => {
-    if (!svgRef.current || dimensions.width === 0 || dimensions.height === 0)
+    if (!svgRef.current || dimensions.width === 0 || dimensions.height === 0) {
+      console.log("SVG or dimensions not ready");
       return;
+    }
 
+    console.log("Rendering chart");
     const svg = d3.select(svgRef.current);
     svg.selectAll("*").remove();
 
@@ -129,14 +137,26 @@ export default function Component({ data }: BarChartProps) {
     svg.attr("aria-label", "Interactive bar chart showing data distribution");
   }, [data, dimensions]);
 
+  if (!data || data.length === 0) {
+    return <div className="text-white">No data available for the chart.</div>;
+  }
+
   return (
-    <div ref={containerRef} className="w-full h-full relative">
-      <svg
-        ref={svgRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        className="w-full h-full"
-      />
+    <div
+      ref={containerRef}
+      className="w-full h-full relative"
+      style={{ minHeight: "400px" }}
+    >
+      {dimensions.width === 0 || dimensions.height === 0 ? (
+        <div className="text-white">Loading chart...</div>
+      ) : (
+        <svg
+          ref={svgRef}
+          width={dimensions.width}
+          height={dimensions.height}
+          className="w-full h-full"
+        />
+      )}
     </div>
   );
 }
