@@ -46,7 +46,7 @@ export default function DashboardPage() {
     }
 
     fetchProjects();
-  }, [user]);
+  }, [user, projects]);
 
   if (loading) {
     return <div>Loading...</div>; // You might want to replace this with a proper loading component
