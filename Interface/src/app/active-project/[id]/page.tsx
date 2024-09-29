@@ -32,15 +32,19 @@ export default function Component({ params }: ComponentProps) {
   }, [user, authLoading, router]);
 
   useEffect(() => {
+    // console.log(user.uid);
+    // console.log("first");
     const fetchFiles = async () => {
-      const userId = user.uid; // Replace with actual user ID
-      const projectId = params?.id || "";
-      const fetchedFiles = await getFilesByUserIdProjectId(userId, projectId);
-      setFiles(fetchedFiles);
+      if (user) {
+        const userId = user.uid; // Replace with actual user ID
+        const projectId = params?.id || "";
+        const fetchedFiles = await getFilesByUserIdProjectId(userId, projectId);
+        setFiles(fetchedFiles);
+      }
     };
 
     fetchFiles();
-  }, [params?.id]);
+  }, [params?.id, user]);
 
   const handleFilesSelect = (file_uuid: string[]) => {
     setSelectedFileIds(file_uuid);
