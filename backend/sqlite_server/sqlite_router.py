@@ -313,7 +313,7 @@ async def get_schema(uuid: str):
                 schema.append(f"CREATE statement: {create_statement}\n")
 
                 # Fetch only 5 rows from the table as this is an example schema for model to generate sql query
-                cursor.execute(f"SELECT * FROM '{table_name}' LIMIT 1000;")
+                cursor.execute(f"SELECT * FROM '{table_name}' LIMIT 10;")
                 rows = cursor.fetchall()
                 if rows:
                     schema.append("Example rows:")
