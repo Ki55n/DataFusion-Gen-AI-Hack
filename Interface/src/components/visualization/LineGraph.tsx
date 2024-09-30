@@ -9,6 +9,8 @@ interface LineGraphProps {
 
 const LineGraph: React.FC<LineGraphProps> = ({ data }) => {
   const svgRef = useRef<SVGSVGElement | null>(null);
+  console.log(data);
+  console.log("yoyoyo");
 
   useEffect(() => {
     if (!svgRef.current) return;

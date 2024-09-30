@@ -8,6 +8,8 @@ import { saveVisualization, Visualization } from "@/db/visualizer";
 import Component from "../visualization/PieChart";
 import { UserAuth } from "@/app/context/AuthContext";
 import LineGraph from "../visualization/LineGraph";
+import LineGraphTest from "../visualization/LineGraphtest";
+import D3ScatterPlot from "../visualization/ScatterPlot";
 
 interface ChatMessage {
   id: string;
@@ -137,6 +139,120 @@ export function ChatPanel({
       }
     }
   };
+  const handleSavePieVisualization = async (message: ChatMessage) => {
+    if (
+      message.visualization &&
+      message.formatted_data_for_visualization &&
+      selectedFileIds.length > 0
+    ) {
+      const visualizationData: Omit<Visualization, "_id"> = {
+        userId: user.uid, // Replace with actual user ID
+        fileId: selectedFileIds[0], // Using the first selected file ID
+        fileName:
+          files.find((file) => file.id === selectedFileIds[0])?.name ||
+          "Unknown",
+        visualizationType: message.visualization,
+        data: message.formatted_data_for_visualization.map((item: any) => ({
+          label: item.labels,
+          value: item.values,
+        })),
+        description: message.content,
+        layout: {
+          i: `viz-${Date.now()}`,
+          x: 0,
+          y: 0,
+          w: 6,
+          h: 4,
+        },
+        summary: message.summary,
+      };
+
+      const result = await saveVisualization(visualizationData);
+      console.log(result);
+      console.log("yoyo");
+      if (result) {
+        console.log("Visualization saved successfully");
+        // You can add a notification or update UI here to indicate successful save
+      } else {
+        console.error("Failed to save visualization");
+        // You can add error handling or user notification here
+      }
+    }
+  };
+  const handleSaveScatterVisualization = async (message: ChatMessage) => {
+    if (
+      message.visualization &&
+      message.formatted_data_for_visualization &&
+      selectedFileIds.length > 0
+    ) {
+      const visualizationData: Omit<Visualization, "_id"> = {
+        userId: user.uid, // Replace with actual user ID
+        fileId: selectedFileIds[0], // Using the first selected file ID
+        fileName:
+          files.find((file) => file.id === selectedFileIds[0])?.name ||
+          "Unknown",
+        visualizationType: message.visualization,
+        data: message.formatted_data_for_visualization,
+        description: message.content,
+        layout: {
+          i: `viz-${Date.now()}`,
+          x: 0,
+          y: 0,
+          w: 6,
+          h: 4,
+        },
+        summary: message.summary,
+      };
+
+      const result = await saveVisualization(visualizationData);
+      console.log(result);
+      console.log("yoyo");
+      if (result) {
+        console.log("Visualization saved successfully");
+        // You can add a notification or update UI here to indicate successful save
+      } else {
+        console.error("Failed to save visualization");
+        // You can add error handling or user notification here
+      }
+    }
+  };
+  const handleSaveLineVisualization = async (message: ChatMessage) => {
+    if (
+      message.visualization &&
+      message.formatted_data_for_visualization &&
+      selectedFileIds.length > 0
+    ) {
+      const visualizationData: Omit<Visualization, "_id"> = {
+        userId: user.uid, // Replace with actual user ID
+        fileId: selectedFileIds[0], // Using the first selected file ID
+        fileName:
+          files.find((file) => file.id === selectedFileIds[0])?.name ||
+          "Unknown",
+        visualizationType: message.visualization,
+        data: message.formatted_data_for_visualization,
+        description: message.content,
+        layout: {
+          i: `viz-${Date.now()}`,
+          x: 0,
+          y: 0,
+          w: 6,
+          h: 4,
+        },
+        summary: message.summary,
+      };
+
+      const result = await saveVisualization(visualizationData);
+      console.log(result);
+      console.log("yoyo");
+      if (result) {
+        console.log("Visualization saved successfully");
+        // You can add a notification or update UI here to indicate successful save
+      } else {
+        console.error("Failed to save visualization");
+        // You can add error handling or user notification here
+      }
+    }
+  };
 
   return (
     <div className="w-[40%] flex flex-col bg-gradient-to-br from-gray-900 via-gray-800 to-black text-white">
@@ -162,11 +278,15 @@ export function ChatPanel({
               style={{
                 border: "1px solid currentColor",
                 boxShadow: "0 0 10px currentColor",
+                wordWrap: "break-word", // Ensure message content wraps to the next line
+                whiteSpace: "pre-wrap", // Preserve whitespace and wrap text
+                maxWidth: "60%", // Ensure the message does not exceed the parent width
               }}
             >
               {message.content}
             </div>
-            {message.visualization == "horizontal_bar" && (
+            {(message.visualization == "horizontal_bar" ||
+              message.visualization == "bar") && (
               <div className="mt-2">
                 <BarChart
                   data={message.formatted_data_for_visualization.labels.map(
@@ -190,7 +310,7 @@ export function ChatPanel({
             )}
 
             {message.visualization == "pie" && (
-              <div className="flex justify-center items-center mt-2">
+              <div className=" mt-2">
                 <Component
                   data={message.formatted_data_for_visualization.map(
                     (item: any) => ({
@@ -199,19 +319,42 @@ export function ChatPanel({
                     })
                   )}
                 />
+                <Button
+                  onClick={() => handleSavePieVisualization(message)}
+                  className="mt-2 bg-green-600 hover:bg-green-700"
+                >
+                  <Save className="ml-2 h-4 w-4" />
+                  Save to Visualizer
+                </Button>
               </div>
             )}
 
+            {message.visualization == "line" && (
+              <div>
+                <LineGraphTest
+                  data={message.formatted_data_for_visualization}
+                />
+                <Button
+                  onClick={() => handleSaveLineVisualization(message)}
+                  className="mt-2 bg-green-600 hover:bg-green-700"
+                >
+                  <Save className="ml-2 h-4 w-4" />
+                  Save to Visualizer
+                </Button>
+              </div>
+            )}
             {message.visualization == "scatter" && (
               <div>
-                <LineGraph
-                  data={message.formatted_data_for_visualization.series[0].data.map(
-                    (item: any) => ({
-                      label: item.x,
-                      value: item.y,
-                    })
-                  )}
+                <D3ScatterPlot
+                  data={message.formatted_data_for_visualization}
                 />
+                <Button
+                  onClick={() => handleSaveScatterVisualization(message)}
+                  className="mt-2 bg-green-600 hover:bg-green-700"
+                >
+                  <Save className="ml-2 h-4 w-4" />
+                  Save to Visualizer
+                </Button>
               </div>
             )}
           </div>

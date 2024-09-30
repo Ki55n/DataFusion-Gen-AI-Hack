@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import Header from "./Header";
 import ProjectCard from "./ProjectCard";
 import LoadProjectsDialog from "./LoadProjectsDialog";
@@ -42,23 +42,45 @@ export default function Dashboard({ initialProjects }: DashboardProps) {
 
   const handleLoadProjects = async (newProjects: Project[]) => {
     try {
+      console.log(newProjects);
       console.log("Loading new projects...");
       console.log(newProjects[0].files);
 
       for (const newProject of newProjects) {
         console.log(`Processing project: ${newProject._id}`);
+        console.log(newProject);
+
+        let allFilesProcessedSuccessfully = true;
 
         // Process files within each project
-        console.log();
         for (const file of newProject.files) {
-          console.log(`Running data cleaning pipeline on file: ${file}`);
-          await dataCleaningPipeline(file);
+          console.log(
+            `Running data cleaning pipeline on file: ${file.file_uuid}`
+          );
+          const cleaningRes = await dataCleaningPipeline(file.file_uuid);
 
-          console.log(`Running data analysis pipeline on file: ${file}`);
-          await dataAnalysisPipeline(file);
+          if (cleaningRes?.status === 200) {
+            console.log(`Running data analysis pipeline on file: ${file}`);
+            const analysisRes = await dataAnalysisPipeline(file.file_uuid);
+
+            if (analysisRes?.status !== 200) {
+              allFilesProcessedSuccessfully = false;
+              console.log(
+                `Data analysis pipeline failed for file: ${file} with response: ${analysisRes}`
+              );
+            }
+          } else {
+            allFilesProcessedSuccessfully = false;
+            console.log(
+              `Data cleaning pipeline failed for file: ${file} with response: ${cleaningRes}`
+            );
+          }
         }
-        // Change project status to active
-        await changeProjectStatus(newProject._id, "active");
+
+        // Change project status to active only if all files were processed successfully
+        if (allFilesProcessedSuccessfully) {
+          await changeProjectStatus(newProject._id, "active");
+        }
       }
 
       // Update state with new projects

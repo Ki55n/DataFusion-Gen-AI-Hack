@@ -94,7 +94,7 @@ export default function CustomerLocationGlobe() {
         <div className="absolute inset-0 rounded-full bg-white opacity-10 blur-3xl"></div>
         <Globe
           ref={globeRef}
-          globeImageUrl="//unpkg.com/three-globe/example/img/earth-dark.jpg"
+          globeImageUrl="//unpkg.com/three-globe/example/img/earth-night.jpg"
           bumpImageUrl="//unpkg.com/three-globe/example/img/earth-topology.png"
           // customGlobeImageUrl={customGlobeImage}
           pointsData={data}

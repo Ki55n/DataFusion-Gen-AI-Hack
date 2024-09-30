@@ -96,11 +96,12 @@ export async function uploadFileToDb(
       console.log(projectId);
       console.log(project);
       if (project) {
-        project.files.push(newFile.file_uuid);
-        await projects.updateOne(
-          { userId: userId },
-          { $set: { files: project.files } }
+        const updating = await projects.updateOne(
+          { userId: userId, _id: new ObjectId(projectId) },
+          //@ts-ignore
+          { $push: { files: newFile } }
         );
+        console.log(updating);
         console.log("File added to project");
       }
 

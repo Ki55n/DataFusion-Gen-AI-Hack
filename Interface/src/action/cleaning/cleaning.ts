@@ -18,6 +18,7 @@ export async function dataCleaningPipeline(file_uuid: string) {
 
     const data = response.data;
     console.log(data);
+    return response;
   } catch (error) {
     console.error("Error:", error);
   }

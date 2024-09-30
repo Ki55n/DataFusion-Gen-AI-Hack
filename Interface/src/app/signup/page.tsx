@@ -23,11 +23,11 @@ export default function Signup() {
   const [alertmsg, setAlertmsg] = useState("");
   const [passwordError, setPasswordError] = useState(""); // Password error state
 
-  useEffect(() => {
-    if (!authLoading && user) {
-      router.push("/dashboard/projects"); // Redirect to the login page if not authenticated
-    }
-  }, [user, authLoading, router]);
+  // useEffect(() => {
+  //   if (!authLoading && user) {
+  //     router.push("/login"); // Redirect to the login page if not authenticated
+  //   }
+  // }, [user, authLoading, router]);
 
   // Password validation logic
   const validatePassword = (password: string) => {

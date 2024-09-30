@@ -46,10 +46,10 @@ export default function DashboardPage() {
     }
 
     fetchProjects();
-  }, [user, projects]);
+  }, [user]);
 
   if (loading) {
-    return <div>Loading...</div>; // You might want to replace this with a proper loading component
+    return <div>Loading...</div>;
   }
 
   return <Dashboard initialProjects={projects} />;

@@ -21,8 +21,8 @@ import "react-resizable/css/styles.css";
 const ResponsiveGridLayout = WidthProvider(Responsive);
 
 // Dynamically import visualization components
-const LineGraph = dynamic(
-  () => import("@/components/visualization/LineGraph"),
+const LineGraphTest = dynamic(
+  () => import("@/components/visualization/LineGraphtest"),
   { ssr: false }
 );
 const PieChart = dynamic(() => import("@/components/visualization/PieChart"), {
@@ -33,6 +33,10 @@ const BarChart = dynamic(() => import("@/components/visualization/BarChart"), {
 });
 const GlobeComponent = dynamic(
   () => import("@/components/visualization/vGlobe"),
+  { ssr: false }
+);
+const ScatterPlot = dynamic(
+  () => import("@/components/visualization/ScatterPlot"),
   { ssr: false }
 );
 
@@ -97,12 +101,17 @@ export default function Dashboard() {
     switch (visualization.visualizationType) {
       case "horizontal_bar":
         return <BarChart data={visualization.data} />;
+      case "bar":
+        return <BarChart data={visualization.data} />;
+
       case "pie":
         return <PieChart data={visualization.data} />;
       case "line":
-        return <LineGraph data={visualization.data} />;
+        return <LineGraphTest data={visualization.data} />;
       case "globe":
         return <GlobeComponent />;
+      case "scatter":
+        return <ScatterPlot data={visualization.data} />;
       default:
         return <div>Unsupported visualization type</div>;
     }
@@ -153,16 +162,23 @@ export default function Dashboard() {
         const utterance = new SpeechSynthesisUtterance(description);
         utterance.rate = 0.7;
 
-        const voices = window.speechSynthesis.getVoices();
-        const ziraVoice =
-          voices.find((voice) => voice.name.includes("Zira")) || voices[0];
+        const setVoiceAndSpeak = () => {
+          const voices = window.speechSynthesis.getVoices();
+          const ziraVoice = voices.find((voice) => voice.name.includes("Zira"));
+          if (ziraVoice) {
+            utterance.voice = ziraVoice;
+          } else if (voices.length > 0) {
+            utterance.voice = voices[0];
+          }
+          utterance.onend = () => setSpeakingId(null);
+          window.speechSynthesis.speak(utterance);
+        };
 
-        if (ziraVoice) {
-          utterance.voice = ziraVoice;
+        if (window.speechSynthesis.getVoices().length === 0) {
+          window.speechSynthesis.onvoiceschanged = setVoiceAndSpeak;
+        } else {
+          setVoiceAndSpeak();
         }
-
-        utterance.onend = () => setSpeakingId(null);
-        window.speechSynthesis.speak(utterance);
       }
     }
   };

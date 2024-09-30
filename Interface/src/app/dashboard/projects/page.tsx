@@ -70,18 +70,17 @@ export default function Component() {
     }
   }, [user, authLoading, router]);
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      if (user && user.uid) {
-        try {
-          const fetchedProjects = await getProjectsByUserId(user.uid);
-          setProjects(fetchedProjects);
-        } catch (error) {
-          console.error("Error fetching projects:", error);
-        }
+  const fetchProjects = async () => {
+    if (user && user.uid) {
+      try {
+        const fetchedProjects = await getProjectsByUserId(user.uid);
+        setProjects(fetchedProjects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
       }
-    };
-
+    }
+  };
+  useEffect(() => {
     fetchProjects();
   }, [user]); // Run this effect when the user changes
 
@@ -104,6 +103,8 @@ export default function Component() {
         setIsOpen(false);
         setNewProject({ name: "", description: "" });
       }
+
+      fetchProjects();
     } catch (error) {
       console.error("Error creating project:", error);
     }
