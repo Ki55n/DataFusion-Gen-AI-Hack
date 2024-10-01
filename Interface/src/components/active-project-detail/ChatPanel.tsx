@@ -18,6 +18,7 @@ interface ChatMessage {
   visualization?: string;
   formatted_data_for_visualization?: any;
   summary?: any;
+  sql_query?: string;
 }
 
 interface ChatPanelProps {
@@ -75,7 +76,9 @@ export function ChatPanel({
         const aiResponse: ChatMessage = {
           id: (Date.now() + 1).toString(),
           sender: "ai",
-          content: data.answer || "Sorry, I couldn't process that request.",
+          content:
+            `${data.answer} + ${data.sql_query}` ||
+            "Sorry, I couldn't process that request.",
           visualization: data.visualization,
           formatted_data_for_visualization:
             data.formatted_data_for_visualization,
