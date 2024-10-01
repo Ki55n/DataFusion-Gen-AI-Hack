@@ -12,13 +12,13 @@
   </p>
 </div>
 
-----------------------------------------
+---
+
 **DataFusion** is an innovative AI-powered platform that transforms how businesses interact with and manage data. It offers a full-fledged web framework to manage your data, use natural language querying and visualization, and enables interactions across multiple data sources.
 
 <p align="center">
   <img src="./docs/logos/DataFusion_Description.svg"/>
 </p>
-
 
 ## 🛠️ Features
 
@@ -40,21 +40,24 @@ To get started:
 4. Load the project into **Active Projects**. This step will run two different pipelines: data cleaning and data analysis.
 5. Once the active project is ready, open the `DataFusion Chat` window on the right.
 6. Ask questions in plain English. For example: `How were mobile phone sales in the first quarter of 2024?` or `Plot a bar chart for mobile phone sales by month.`
-7. Store the generated visualizations to the `Visualizer` page for later exploration. 
-
+7. Store the generated visualizations to the `Visualizer` page for later exploration.
 
 ## 💡 Example Queries
+
 The model's responses depend heavily on the input queries. Whether you receive a simple one-liner answer, a detailed explanation, or a visualization depends on the query and the specific keywords used. Below, we'll explore how queries and their responses can vary.
 
 Consider you have a dataset of passengers who survived the Titanic accident. You may want to ask the following queries:
 
 1. What is the distribution of passenger classes (first, second, third) on the Titanic?
+
    - Provides a text answer and plots a `pie chart` showing the number of people in each passenger class.
 
 2. How many males survived the Titanic accident?
+
    - Returns a text answer as visualization is not applicable.
 
 3. How does the survival rate vary across different age groups?
+
    - Plots a line graph and explains how the survival rate changes for different age groups.
 
 4. Plot a bar chart to understand the age distribution of males vs females.
@@ -66,15 +69,82 @@ Consider you have a dataset of passengers who survived the Titanic accident. You
 - `backend/`
   - `my_agent/` - Backbone of the AI server.
   - `sqlite-server/` - Backbone of the SQLite server.
-- `frontend/`
+- `interface/`
+
+The Next.js application resides in the `interface` folder. All frontend functionalities and interactions are managed here.
+
+### Setting Up the Interface
+
+To set up and run the project locally:
+
+1. **Clone the Repository**:  
+   Clone the repository to your local machine.
+
+   ```bash
+   git clone https://github.com/Ki55n/DataFusion-Gen-AI-Hack.git
+   ```
+
+2. **Install Dependencies**:  
+   Navigate to the `interface` folder and install the required dependencies.
+
+   ```bash
+   cd interface
+   npm install
+   ```
+
+3. **Set Up Environment Variables**:  
+   Copy the provided `.env.example` file and rename it to `.env`.
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Fill in the necessary environment variables (e.g., Firebase and MongoDB credentials).
+
+   ```bash
+   NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key
+   NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
+   NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_firebase_project_id
+   NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
+   NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
+   NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
+   NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
+   NEXT_PUBLIC_MONGO_URL=your_mongo_url
+   # NEXT_PUBLIC_SQLITE_URL=your_sqlite_url
+   # NEXT_PUBLIC_AI_BACKEND_URL=your_ai_backend_url
+   ```
+
+4. **Run the Application**:  
+   After configuring the environment, start the development server.
+
+   ```bash
+   npm run dev
+   ```
+
+   The app will be available at `http://localhost:3000`.
+
+> **ℹ️ For more detailed setup documentation, please visit:**  
+> [**Setup Documentation**](https://github.com/himeshparashar/DataFusion-Gen-AI-Hack/tree/main/docs)
+
+## 🌐 Deployed Application
+
+The application is deployed and can be accessed at:  
+[https://data-fusion-gen-ai-hack.vercel.app/](https://data-fusion-gen-ai-hack.vercel.app/)
+
+## 🧪 Testing Credentials
+
+For testing purposes, you can use the following credentials:
+
+- **Email**: lemag27343@abevw.com
+- **Password**: Datafusion@123
 
 ## 📖 About us
-We are a dedicated team of developers passionate about simplifying data analysis and visualization. 
 
-Team members: 
+We are a dedicated team of developers passionate about simplifying data analysis and visualization.
+
+Team members:
+
 - Akshay Pimpalkar
 - Himesh Parashar
 - Kiran Chawan
 - Mamoon Jan
-
-
