@@ -24,12 +24,12 @@ export default function Aside() {
       name: "Active Projects",
     },
     { route: "/dashboard/visualizer", icon: <CiUser />, name: "Visualizer" },
-    { route: "/dashboard/cleaner", icon: <CiCreditCard1 />, name: "Cleaner" },
-    {
-      route: "/chat-with-data",
-      icon: <CiCalendarDate />,
-      name: "Chat with data",
-    },
+    // { route: "/dashboard/cleaner", icon: <CiCreditCard1 />, name: "Cleaner" },
+    // {
+    //   route: "/chat-with-data",
+    //   icon: <CiCalendarDate />,
+    //   name: "Chat with data",
+    // },
   ];
 
   const handleSignOut = async () => {
