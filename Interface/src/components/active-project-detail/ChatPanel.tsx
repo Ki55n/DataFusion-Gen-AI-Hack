@@ -19,6 +19,7 @@ interface ChatMessage {
   formatted_data_for_visualization?: any;
   summary?: any;
   sql_query?: string;
+  user_query?: string;
 }
 
 interface ChatPanelProps {
@@ -83,6 +84,7 @@ export function ChatPanel({
           formatted_data_for_visualization:
             data.formatted_data_for_visualization,
           summary: data.visualization_summary,
+          user_query: currentMessage,
         };
         setChatMessages((prev) => [...prev, aiResponse]);
       } catch (error) {
@@ -108,7 +110,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName: message.content,
+        fileName: message.user_query || "Data Visualization",
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization.labels.map(
           (label: any, index: any) => ({
