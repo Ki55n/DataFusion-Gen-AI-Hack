@@ -105,9 +105,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName:
-          files.find((file) => file.id === selectedFileIds[0])?.name ||
-          "Unknown",
+        fileName: message.content,
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization.labels.map(
           (label: any, index: any) => ({
@@ -148,9 +146,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName:
-          files.find((file) => file.id === selectedFileIds[0])?.name ||
-          "Unknown",
+        fileName: message.content,
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization.map((item: any) => ({
           label: item.labels,
@@ -188,9 +184,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName:
-          files.find((file) => file.id === selectedFileIds[0])?.name ||
-          "Unknown",
+        fileName: message.content,
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization,
         description: message.content,
@@ -225,9 +219,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName:
-          files.find((file) => file.id === selectedFileIds[0])?.name ||
-          "Unknown",
+        fileName: message.content,
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization,
         description: message.content,

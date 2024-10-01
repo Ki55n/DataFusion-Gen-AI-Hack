@@ -75,7 +75,7 @@ export default function Component({ params }: ComponentProps) {
         let url = window.URL.createObjectURL(blob);
         let a = document.createElement("a");
         a.href = url;
-        a.download = "analyzed_data.pdf";
+        a.download = "analyzed_data.pdf ";
         a.click();
       });
     });

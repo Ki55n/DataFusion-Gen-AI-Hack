@@ -44,6 +44,12 @@ export function FileList({
     );
   };
 
+  const handleSelectAll = (isChecked: boolean) => {
+    const allFileIds = isChecked ? files.map((file) => file.file_uuid) : [];
+    setSelectedFiles(allFileIds);
+    onFilesSelect(allFileIds);
+  };
+
   const addNewFile = () => {
     // Implementation for adding a new file
   };
@@ -59,7 +65,12 @@ export function FileList({
       </div>
       <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-700 flex justify-between text-sm font-medium text-gray-400">
-          <span className="w-1/12">Select</span>
+          <span className="w-1/12">
+            <Checkbox
+              checked={selectedFiles.length === files.length}
+              onCheckedChange={(checked) => handleSelectAll(checked as boolean)}
+            />
+          </span>
           <span className="w-2/5">Name</span>
           <span className="w-1/5 text-right">Size</span>
           <span className="w-1/5 text-right">Upload Date</span>
