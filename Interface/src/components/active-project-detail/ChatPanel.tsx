@@ -151,7 +151,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName: message.content,
+        fileName: message.user_query || "Data Visualization",
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization.map((item: any) => ({
           label: item.labels,
@@ -189,7 +189,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName: message.content,
+        fileName: message.user_query || "Data Visualization",
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization,
         description: message.content,
@@ -224,7 +224,7 @@ export function ChatPanel({
       const visualizationData: Omit<Visualization, "_id"> = {
         userId: user.uid, // Replace with actual user ID
         fileId: selectedFileIds[0], // Using the first selected file ID
-        fileName: message.content,
+        fileName: message.user_query || "Data Visualization",
         visualizationType: message.visualization,
         data: message.formatted_data_for_visualization,
         description: message.content,
