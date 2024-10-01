@@ -60,10 +60,10 @@ export default function LoadProjectsDialog({
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        {/* <Button variant="outline">
           <Plus className="mr-2 h-4 w-4" />
           Load Projects
-        </Button>
+        </Button> */}
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px] bg-gray-800 text-gray-100">
         <DialogHeader>
