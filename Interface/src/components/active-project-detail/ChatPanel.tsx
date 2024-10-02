@@ -78,7 +78,9 @@ export function ChatPanel({
           id: (Date.now() + 1).toString(),
           sender: "ai",
           content:
-            `${data.answer} + ${data.sql_query}` ||
+          `${data.answer}\n\n` +
+          `Generated SQL Query:\n` +
+          `\`${data.sql_query}\`\n` ||
             "Sorry, I couldn't process that request.",
           visualization: data.visualization,
           formatted_data_for_visualization:
