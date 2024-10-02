@@ -1,3 +1,4 @@
+
 <div align="center">
 
   <a href="https://github.com/Ki55n/DataFusion-Gen-AI-Hack">
@@ -110,8 +111,8 @@ To set up and run the project locally:
    NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id
    NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_firebase_measurement_id
    NEXT_PUBLIC_MONGO_URL=your_mongo_url
-   # NEXT_PUBLIC_SQLITE_URL=your_sqlite_url
-   # NEXT_PUBLIC_AI_BACKEND_URL=your_ai_backend_url
+   NEXT_PUBLIC_SQLITE_URL="http://localhost:8000"
+   NEXT_PUBLIC_AI_BACKEND_URL="http://localhost:8001"
    ```
 
 4. **Run the Application**:  
@@ -122,6 +123,38 @@ To set up and run the project locally:
    ```
 
    The app will be available at `http://localhost:3000`.
+
+### Setting Up FastAPI AI Backend
+
+In addition to the Next.js frontend, this project also includes a Python FastAPI service that handles all AI and data operations. The FastAPI service is responsible for running both the SQLite server and the AI backend.
+
+#### GCP-Deployed FastAPI URLs:
+
+- **NEXT_PUBLIC_SQLITE_URL**: [https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/sqlite-server](https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/sqlite-server)
+- **NEXT_PUBLIC_AI_BACKEND_URL**: [https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/ai-server](https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/ai-server)
+
+#### Running FastAPI Locally
+
+To run the FastAPI service locally:
+
+1. **Build the Docker Image**:
+
+   ```bash
+   docker build -t datafusion .
+   ```
+
+2. **Run the Docker Container**:
+
+   ```bash
+   docker run -p 8000:8000 -p 8001:8001 -d datafusion
+   ```
+
+For local development, update the `.env` file inside the `interface` folder with:
+
+```bash
+NEXT_PUBLIC_SQLITE_URL="http://localhost:8000"
+NEXT_PUBLIC_AI_BACKEND_URL="http://localhost:8001"
+```
 
 > **ℹ️ For more detailed setup documentation, please visit:**  
 > [**Setup Documentation**](https://github.com/himeshparashar/DataFusion-Gen-AI-Hack/tree/main/docs)
