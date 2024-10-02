@@ -35,7 +35,7 @@
 
 To get started:
 
-1. Jump to the [project page](project/page/link) and create an account.
+1. Jump to the [project page](https://data-fusion-gen-ai-hack.vercel.app/) and create an account.
 2. Create a project for your data source. For example: `Project E-Commerce`
 3. Upload all the relevant data sources to the project. For example: `Customers.csv`, `Profits.csv`, `Orders.csv`, and `Products.csv`.
 4. Load the project into **Active Projects**. This step will run two different pipelines: data cleaning and data analysis.
@@ -130,8 +130,8 @@ In addition to the Next.js frontend, this project also includes a Python FastAPI
 
 #### GCP-Deployed FastAPI URLs:
 
-- **NEXT_PUBLIC_SQLITE_URL**: [https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/sqlite-server](https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/sqlite-server)
-- **NEXT_PUBLIC_AI_BACKEND_URL**: [https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/ai-server](https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/ai-server)
+- **NEXT_PUBLIC_SQLITE_URL**: [https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/sqlite-server/](https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/sqlite-server/)
+- **NEXT_PUBLIC_AI_BACKEND_URL**: [https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/ai-server/](https://datafusion-deployed-235676937529.northamerica-northeast1.run.app/ai-server/)
 
 #### Running FastAPI Locally
 
@@ -157,7 +157,7 @@ NEXT_PUBLIC_AI_BACKEND_URL="http://localhost:8001"
 ```
 
 > **ℹ️ For more detailed setup documentation, please visit:**  
-> [**Setup Documentation**](https://github.com/himeshparashar/DataFusion-Gen-AI-Hack/tree/main/docs)
+> [**Setup Documentation**](./docs/)
 
 ## 🌐 Deployed Application
 
