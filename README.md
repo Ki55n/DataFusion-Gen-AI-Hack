@@ -10,12 +10,14 @@
     <a href="https://data-fusion-umber.vercel.app/login">Website</a>
     ·
     <a href="./docs">Docs</a>
+    ·
+    <a href="https://youtu.be/9DG4lohVYJw">Demo</a>
   </p>
 </div>
 
 ---
 
-**DataFusion** is an innovative AI-powered platform that transforms how businesses interact with and manage data. It offers a full-fledged web framework to manage your data, use natural language querying and visualization, and enables interactions across multiple data sources.
+**DataFusion** is an innovative AI-powered platform that transforms how businesses interact with and manage data. It offers a full-fledged web framework to manage your data, use natural language querying and visualization, and enable interactions across multiple data sources.
 
 <p align="center">
   <img src="./docs/logos/DataFusion_Description.svg"/>
