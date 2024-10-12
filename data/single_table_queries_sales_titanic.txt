@@ -1,0 +1,25 @@
+Sales_december_2019_queries:
+
+	1. Summarize the data
+	2. Which product sold the most?
+	3. Which product sold the least?
+	4. How many iPhones were sold?
+	5. How many AAA Batteries 4pack were sold?
+
+
+Titanic questions:
+
+	1. How old was Gill, Mr. John William when he died?
+	2. What is the distribution of male survived?
+
+	Pie chart:
+	- What is the distribution of passenger classes (first, second, third) on the Titanic?
+	- What is the distribution of passenger ages (grouped into age ranges)?
+	- What is the distribution of cabin types (e.g., A, B, C, etc.)?
+
+	Line chart:
+	- What is the distribution of male survived?
+	- How did the survival rate change based on the passengers age?
+
+Sakila-database:
+> Q> What is the total number of movies in each rating category held in inventory? sort them descendingly.
